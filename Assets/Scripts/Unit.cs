@@ -119,7 +119,6 @@ public class Info {
 		if (Regex.IsMatch(designation, ".*(naval|anti-ship|coastal).*")) return Modifier1.Naval;
 
 		if (designation.Contains("rocket")) return Modifier1.MLRS;
-		if (designation.Contains("eod")) return Modifier1.EOD;
 		if (designation.Contains("fdc")) return Modifier1.FDC;
 		if (designation.Contains("lhs")) return Modifier1.LHS;
 		if (designation.Contains("pls")) return Modifier1.PLS;
@@ -137,6 +136,13 @@ public class Info {
 		if (Regex.IsMatch(notes, ".*[rR]ole.4.*")) return Modifier1.MED4;
 		if (Regex.IsMatch(designation, ".*combat.*eng.*")) return Modifier1.Combat;
 
+		if (designation.Contains("brigade")) return Modifier1.Brigade;
+		if (designation.Contains("division")) return Modifier1.Division;
+		if (designation.Contains("corps")) return Modifier1.Corps;
+		if (designation.Contains("army")) return Modifier1.Army;
+		if (designation.Contains("theater")) return Modifier1.Theatre;
+		if (designation.Contains("independent")) return Modifier1.IndependentCommand;
+
 		if (designation.Contains("electro-optical")) return Modifier1.ElectroOptical;
 		if (designation.Contains("node")) return Modifier1.JointNetworkNode;
 		if (designation.Contains("network")) return Modifier1.Network;
@@ -149,13 +155,6 @@ public class Info {
 		if (Regex.IsMatch(designation, ".*(electronic installation).*")) return Modifier1.SIGINT;
 		if (designation.Contains("survey")) return Modifier1.Survey;
 		if (Regex.IsMatch(designation, "^space$")) return Modifier1.TacticalSattelite;
-
-		if (designation.Contains("brigade")) return Modifier1.Brigade;
-		if (designation.Contains("division")) return Modifier1.Division;
-		if (designation.Contains("corps")) return Modifier1.Corps;
-		if (designation.Contains("army")) return Modifier1.Army;
-		if (designation.Contains("theater")) return Modifier1.Theatre;
-		if (designation.Contains("independent")) return Modifier1.IndependentCommand;
 
 		if (designation.Contains("dog")) return Modifier1.Dog;
 		if (Regex.IsMatch(designation, ".*(radar|missile warn|space (comm|oper)).*")) return Modifier1.Radar;
@@ -179,7 +178,7 @@ public class Info {
 		if (designation.Contains("river")) return Modifier2.Riverine;
 
 		if (designation.Contains("supply")) return Modifier2.Supply;
-		if (Regex.IsMatch(designation, ".*[^service].*support.*")) return Modifier2.Support;
+		if (Regex.IsMatch(designation, ".*[^service].*support.*^(?!.*\bhospital\b).*")) return Modifier2.Support;
 
 		if (Regex.IsMatch(designation, ".*(helicopter|heavy.*defence).*")) return Modifier2.Heavy;
 		if (Regex.IsMatch(designation, ".*(medium marine).*")) return Modifier2.Wheeled;
@@ -253,7 +252,7 @@ public class Info {
 
 		//Name matching
 		#region Maneuvre
-		if (Regex.IsMatch(designation, ".*(guard.*|yeomenry.*|reserve.*|personnel$|airborne$)")) type = UnitType.Infantry;
+		if (Regex.IsMatch(designation, ".*(guard.*|yeomenry.*|[^p]reserve.*|personnel$|airborne$)")) type = UnitType.Infantry;
 		else if (designation.Contains("combined")) type = UnitType.CombinedArms;
 		else if (designation.Contains("weapons")) {
 			if (Regex.IsMatch(designation, ".*(mechanized|armoured).*")) type = UnitType.InfantryMechanized;
@@ -376,9 +375,9 @@ public class Info {
 		} 
 		else if (designation.Contains("analysis") && designation.Contains("electronic war")) type = UnitType.ElectronicWarfareAnalysis;
 		else if (designation.Contains("analysis")) type = UnitType.Analysis;
+		else if (Regex.IsMatch(designation, ".*counter.intel.*")) type = UnitType.CounterIntelligence;
 		else if (Regex.IsMatch(designation, ".*(^space intelligence|sattelite|aerospace surve).*")) type = UnitType.SignalTacticalSatellite;
 		else if (Regex.IsMatch(designation, ".*(intel|missile warn|operations s|radar post|a.*control|space comm|combat info).*")) type = UnitType.MilitaryIntelligence;
-		else if (Regex.IsMatch(designation, ".*counter.intel.*")) type = UnitType.CounterIntelligence;
 		else if (designation.Contains("direction finding")) type = UnitType.ElectronicWarfareDirectionFinding;
 		else if (designation.Contains("electronic rang")) type = UnitType.ElectronicRanging;
 		else if (designation.Contains("electronic interc")) type = UnitType.ElectronicWarfareIntercept;
@@ -431,7 +430,7 @@ public class Info {
 		else if (Regex.IsMatch(designation, ".*(maint|repair|preserv).*")) type = UnitType.Maintenance;
 
 		else if (designation.Contains("public rel")) type = UnitType.PublicAffairs;
-		else if (Regex.IsMatch(designation, ".*civil affairs off")) type = UnitType.CivilAffairs;
+		else if (Regex.IsMatch(designation, ".*civil affairs [^a]")) type = UnitType.CivilAffairs;
 		else if (designation.Contains("postal")) type = UnitType.Postal;
 		else if (designation.Contains("financ")) type = UnitType.Finance;
 		else if (designation.Contains("labour")) type = UnitType.Labour;
