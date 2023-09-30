@@ -6,6 +6,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
+using System.Drawing;
 
 public class FileManager : MonoBehaviour {
 	//File
@@ -34,6 +35,19 @@ public class FileManager : MonoBehaviour {
 		}
 		dropdown.AddOptions(new List<string>(enumNames));
 		dropdown.value = GetTier();
+
+		filePath = "C:/Users/Toonu/Downloads/Iconian Order of Battle - OOB.csv";
+		LoadCSVFile();
+
+		UnitIdentificator = "army";
+		ParseJSONFile("Army");
+		UnitIdentificator = "air";
+		ParseJSONFile("Air Force");
+		UnitIdentificator = "navy";
+		ParseJSONFile("Navy");
+		Tier = UnitTier.XXX;
+		UnitIdentificator = "Corp";
+		ParseJSONFile("Marine Corps");
 	}
 
 	public void LoadCSVFile() {
@@ -42,7 +56,7 @@ public class FileManager : MonoBehaviour {
 		popup.gameObject.SetActive(true);
 		List<string> csvRows;
 		try {
-			filePath = UnityEditor.EditorUtility.OpenFilePanel("Open File", "", ""); if (filePath == null || filePath == "") return;
+			if (filePath == null || filePath == "") filePath = UnityEditor.EditorUtility.OpenFilePanel("Open File", "", ""); if (filePath == null || filePath == "") return;
 			csvRows = File.ReadAllLines(filePath, Encoding.Default).ToList();
 			unitDatabase.Clear();
 		} catch (Exception e) {
@@ -63,7 +77,7 @@ public class FileManager : MonoBehaviour {
 		Debug.Log("Import finished");
 	}
 
-	public void ParseJSONFile() {
+	public void ParseJSONFile(string fileName = "Units") {
 		if (unitDatabase.Count == 0) { popup.PopUp("First load your unit file!", 5); return; }
 
 		//Finding unit and creating list of its subordinate units.
@@ -102,9 +116,9 @@ public class FileManager : MonoBehaviour {
 		//Shuffle the lower echelons to back
 		foreach (Unit currentUnit in units) {
 			currentUnit.subordinates = currentUnit.subordinates
-				.OrderBy(x => x.info.unitType)
-				.ThenByDescending(y => y.info.unitTier)
-				.ThenBy(z => int.Parse(z.info.ID)).ToList();
+				.OrderByDescending(x => x.info.unitTier)
+				.ThenBy(z => int.Parse(z.info.ID))
+				.ToList();
 
 			//Put HQ at the top no matter what
 			Unit HQ = currentUnit.subordinates.Find(x => x.info.m1 == Modifier1.HQ);
@@ -112,11 +126,9 @@ public class FileManager : MonoBehaviour {
 				currentUnit.subordinates.Remove(HQ);
 				currentUnit.subordinates.Insert(0, HQ);
 			}
-		}
+		}		
 
-		
-
-		ExportJSON(unit);
+		ExportJSON(unit, fileName);
 
 		//Cleanup
 		foreach (Unit u in units) {
@@ -137,14 +149,6 @@ public class FileManager : MonoBehaviour {
 		}
 	}
 
-	/*private void SortUnits(Unit unit) {
-		unit.subordinates = unit.subordinates.OrderBy(x => x.info.unitType).ThenByDescending(y => y.info.unitTier).ToList();
-		//unit.subordinates = unit.subordinates.OrderByDescending(x => x.info.unitTier).ThenBy(y => y.info.unitType).ToList();
-		foreach (Unit subordinate in unit.subordinates) {
-			SortUnits(subordinate);
-		}
-	}*/
-
 	private int FindHigherEchelon(Unit currentUnit, Dictionary<UnitTier, int> currentUnits, int position) {
 		//Create a new temporary dictionary with units higher than the current unit echelon and get closest distance to unit.
 		return currentUnits
@@ -154,10 +158,10 @@ public class FileManager : MonoBehaviour {
 			.First();
 	}
 
-	private void ExportJSON(Unit unit) {
+	private void ExportJSON(Unit unit, string fileName) {
 		//Transform old path into new file path, check for existing file and so on.
 		filePath ??= Application.dataPath; //Assign default if empty
-		string newFilePath = $"{string.Join("/", filePath.Split('/').Take(filePath.Split('/').Length - 1))}/Units.json";
+		string newFilePath = $"{string.Join("/", filePath.Split('/').Take(filePath.Split('/').Length - 1))}/{fileName}.json";
 		if (!File.Exists(newFilePath)) File.Create(newFilePath).Close();
 		string jsonString = JsonConvert.SerializeObject(unit,
 			new JsonSerializerSettings() { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore });
