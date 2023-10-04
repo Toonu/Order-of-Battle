@@ -36,7 +36,15 @@ public class FileManager : MonoBehaviour {
 		dropdown.AddOptions(new List<string>(enumNames));
 		dropdown.value = GetTier();
 
+#if UNITY_EDITOR_OSX
+		filePath = "/Users/toonu/Downloads/Iconian Order of Battle - OOB.csv";
+#elif UNITY_EDITOR_64
 		filePath = "C:/Users/Toonu/Downloads/Iconian Order of Battle - OOB.csv";
+#elif UNITY_STANDALONE_OSX
+		filePath = "/Users/toonu/Downloads/Iconian Order of Battle - OOB.csv";
+#else
+		filePath = "C:/Users/Toonu/Downloads/Iconian Order of Battle - OOB.csv";
+#endif
 		LoadCSVFile();
 
 		UnitIdentificator = "army";

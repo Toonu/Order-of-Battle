@@ -168,7 +168,7 @@ public class Info {
 	public Modifier2 SetModifier2(string designation) {
 		designation = designation.ToLower();
 		if (Regex.IsMatch(designation, ".*(airborne|parachut).*")) return Modifier2.Airborne;
-		if (Regex.IsMatch(designation, ".*(wheeled|motorized|mechanized.*hh|medium marine|sph).*")) return Modifier2.Wheeled;
+		if (Regex.IsMatch(designation, ".*(wheeled|motorized|mechanized.*hh|medium marine|sph|self-propelled art).*")) return Modifier2.Wheeled;
 		if (designation.Contains("towed")) return Modifier2.Towed;
 		if (designation.Contains("tracked")) return Modifier2.Tracked;
 		if (designation.Contains("assault")) return Modifier2.AirAssault;
@@ -310,8 +310,8 @@ public class Info {
 			else type = UnitType.AntiTank;
 		} else if (designation.Contains("light air defence")) type = UnitType.AirDefense;
 		else if (Regex.IsMatch(designation, ".*(?:air.defence|missile.defence).*")) type = UnitType.AirDefenseMissile;
+		else if (Regex.IsMatch(designation, ".*(?:sph|self-propelled).*")) type = UnitType.ArtillerySPH;
 		else if (Regex.IsMatch(designation, ".*(?:artillery|fires).*")) type = UnitType.Artillery;
-		else if (designation.Contains("sph")) type = UnitType.ArtillerySPH;
 		else if (designation.Contains("target acq")) type = UnitType.ArtilleryTargetAcquisition;
 		else if (designation.Contains("forward obs")) type = UnitType.ArtilleryForwardObserver;
 		else if (Regex.IsMatch(designation, ".*(?:anti.ship|coastal def).*")) type = UnitType.Missile;
