@@ -6,7 +6,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
-using System.Drawing;
+using UnityEditor;
 
 public class FileManager : MonoBehaviour {
 	//File
@@ -38,7 +38,7 @@ public class FileManager : MonoBehaviour {
 
 #if UNITY_EDITOR_OSX
 		filePath = "/Users/toonu/Downloads/Iconian Order of Battle - OOB.csv";
-#elif UNITY_EDITOR_64
+#elif UNITY_EDITOR
 		filePath = "C:/Users/Toonu/Downloads/Iconian Order of Battle - OOB.csv";
 #elif UNITY_STANDALONE_OSX
 		filePath = "/Users/toonu/Downloads/Iconian Order of Battle - OOB.csv";
@@ -56,6 +56,17 @@ public class FileManager : MonoBehaviour {
 		Tier = UnitTier.XXX;
 		UnitIdentificator = "Corp";
 		ParseJSONFile("Marine Corps");
+		Tier = UnitTier.XX;
+		UnitIdentificator = "sup";
+		ParseJSONFile("Support Command");
+		Tier = UnitTier.XX;
+		UnitIdentificator = "aerospace";
+		ParseJSONFile("Aerospace Divisions");
+#if UNITY_EDITOR
+		EditorApplication.ExitPlaymode();
+#else
+		Application.Quit();
+#endif
 	}
 
 	public void LoadCSVFile() {
@@ -64,7 +75,7 @@ public class FileManager : MonoBehaviour {
 		popup.gameObject.SetActive(true);
 		List<string> csvRows;
 		try {
-			if (filePath == null || filePath == "") filePath = UnityEditor.EditorUtility.OpenFilePanel("Open File", "", ""); if (filePath == null || filePath == "") return;
+			if (filePath == null || filePath == "") filePath = EditorUtility.OpenFilePanel("Open File", "", ""); if (filePath == null || filePath == "") return;
 			csvRows = File.ReadAllLines(filePath, Encoding.Default).ToList();
 			unitDatabase.Clear();
 		} catch (Exception e) {

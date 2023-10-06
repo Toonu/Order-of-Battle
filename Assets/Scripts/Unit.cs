@@ -98,8 +98,8 @@ public class Info {
 			Enum.TryParse(tierText.ToUpper(), out unitType);
 		} else {
 			(unitType, fillColor) = ConvertIDToType(designation, tierText);
-			m1 = SetModifier1(designation, notes);
-			m2 = SetModifier2(designation);
+			m1 = SetModifier1(designation, notes, tierText);
+			m2 = SetModifier2(designation, tierText);
 		}
 
 		sidc = CalculateSIDC();
@@ -109,12 +109,17 @@ public class Info {
 		return "3003" + (int)domain + (isReserve ? 1 : 0) + "0" + $"{(int)unitTier:D2}" + $"{(int)unitType:D6}" + (domain == Domain.land ? $"{(int)m1:D2}" + $"{(int)m2:D2}" : "");
 	}
 
-	public Modifier1 SetModifier1(string designation, string notes) {
+	public Modifier1 SetModifier1(string designation, string notes, string tierText) {
+		tierText = tierText.ToLower();
 		designation = designation.ToLower();
 		if (Regex.IsMatch(designation, ".*(support command).*")) return Modifier1.Army;
-		if (Regex.IsMatch(designation, "^(?=(.*?(hq|headquarters|hh|admiralty|command|praesidium|institute|department|medical support adm|c\\d).*))(?!.*secu)")) return Modifier1.HQ;
+		if (Regex.IsMatch(designation, "^(?=(.*?(hq|headquarters|hh|admiralty|command|praesidium|institute|directorate|department|medical support adm|c\\d).*))(?!.*secu)")) return Modifier1.HQ;
 		if (designation.Contains("fighter")) return Modifier1.Force;
-		if (designation.Contains("helicopter")) return Modifier1.Utility;
+		if (designation.Contains("helicopter")) {
+			if (designation.Contains("sar")) { } 
+			else if (designation.Contains("attack")) return Modifier1.Attack;
+			else return Modifier1.Utility;
+		}
 		if (designation.Contains("aviation")) return Modifier1.Aviation;
 		if (Regex.IsMatch(designation, ".*(naval|anti-ship|coastal).*")) return Modifier1.Naval;
 
@@ -122,6 +127,7 @@ public class Info {
 		if (designation.Contains("fdc")) return Modifier1.FDC;
 		if (designation.Contains("lhs")) return Modifier1.LHS;
 		if (designation.Contains("pls")) return Modifier1.PLS;
+		if (Regex.IsMatch(designation, ".*sof.*") && Regex.IsMatch(tierText, ".*(?:wing|squadron|flight).*")) return Modifier1.SOF;
 
 		if (designation.Contains("weapons")) return Modifier1.Weapons;
 		if (designation.Contains("airbase")) return Modifier1.Aifield;
@@ -130,7 +136,7 @@ public class Info {
 		if (designation.Contains("network")) return Modifier1.Network;
 		if (designation.Contains("construction")) return Modifier1.Construction;
 
-		if (Regex.IsMatch(designation, ".*med.*(evac|trans).*")) return Modifier1.MEDEVAC;
+		if (Regex.IsMatch(designation, ".*medic.*(evac|trans).*")) return Modifier1.MEDEVAC;
 		if (Regex.IsMatch(designation, ".*[^c]sar.*")) return Modifier1.SAR;
 		if (Regex.IsMatch(notes, ".*[rR]ole.1.*")) return Modifier1.MED1;
 		if (Regex.IsMatch(notes, ".*[rR]ole.2.*")) return Modifier1.MED2;
@@ -165,12 +171,13 @@ public class Info {
 		return Modifier1.Empty;
 	}
 
-	public Modifier2 SetModifier2(string designation) {
+	public Modifier2 SetModifier2(string designation, string tierText) {
 		designation = designation.ToLower();
-		if (Regex.IsMatch(designation, ".*(airborne|parachut).*")) return Modifier2.Airborne;
-		if (Regex.IsMatch(designation, ".*(wheeled|motorized|mechanized.*hh|medium marine|sph|self-propelled art).*")) return Modifier2.Wheeled;
-		if (designation.Contains("towed")) return Modifier2.Towed;
+		tierText = tierText.ToLower();
+		if (Regex.IsMatch(designation, ".*(?:airborne|parachut).*")) return Modifier2.Airborne;
+		if (Regex.IsMatch(designation, ".*(?:wheeled|motorized.*hh|medium marine|sph|self-propelled art).*")) return Modifier2.Wheeled;
 		if (designation.Contains("tracked")) return Modifier2.Tracked;
+		if (designation.Contains("towed")) return Modifier2.Towed;
 		if (designation.Contains("assault")) return Modifier2.AirAssault;
 		if (designation.Contains("amphibious")) return Modifier2.Amphibious;
 		if (designation.Contains("arctic")) return Modifier2.Arctic;
@@ -179,10 +186,12 @@ public class Info {
 		if (designation.Contains("river")) return Modifier2.Riverine;
 
 		if (designation.Contains("supply")) return Modifier2.Supply;
-		if (Regex.IsMatch(designation, ".*[^service].*support.*^(?!.*\bhospital\b).*")) return Modifier2.Support;
+		if (designation.Contains("support") && !designation.Contains("hospital") && !designation.Contains("service")) return Modifier2.Support;
 
-		if (Regex.IsMatch(designation, ".*(helicopter|heavy.*defence).*")) return Modifier2.Heavy;
 		if (designation.Contains("csar")) return Modifier2.CSAR;
+		if (Regex.IsMatch(designation, ".*(helicopter|heavy.*defence).*")) return Modifier2.Heavy;
+		if (Regex.IsMatch(designation, ".*transport.*") && Regex.IsMatch(tierText, ".*(?:wing|squadron|flight).*")) return Modifier2.Troop;
+		if (designation.Contains("fighter-bomber")) return Modifier2.Attack;
 		if (designation.Contains("cyber")) return Modifier2.Cyberspace;
 		if (designation.Contains("decon")) return Modifier2.Decontamination;
 		if (Regex.IsMatch(designation, "\\sdental\\s]")) return Modifier2.Dental;
@@ -233,8 +242,11 @@ public class Info {
 			case "flight":
 			case "air force":
 				colour = "#80e0ff";
-				if (designation.Contains("helicopter")) type = UnitType.Aviation;
-				else if (Regex.IsMatch(designation, ".*(fighter|school).*")) type = UnitType.AviationFixedWing;
+				if (designation.Contains("helicopter")) {
+					if (Regex.IsMatch(designation, ".*(?:recon|combin|attack).*")) type = UnitType.AviationReconnaissance;
+					else type = UnitType.Aviation;
+				} 
+				else if (Regex.IsMatch(designation, ".*(?:fighter|school).*")) type = UnitType.AviationFixedWing;
 				else if (designation.Contains("combined")) type = UnitType.AviationComposite;
 				else if (designation.Contains("uav")) type = UnitType.UnmannedAerialVehicle;
 				else if (designation.Contains("cyber")) return (UnitType.ElectronicWarfare, "#ffffff");
@@ -252,9 +264,9 @@ public class Info {
 
 		//Name matching
 		#region Maneuvre
-		if (Regex.IsMatch(designation, ".*(?:guard.*|yeomenry.*|reserve(?!.*preserv).*|personnel$|airborne$)")) type = UnitType.Infantry;
+		if (Regex.IsMatch(designation, ".*(?:guard.*|yeomenry.*|reserve(?!.*preserv).*|personnel$)")) type = UnitType.Infantry;
 		else if (designation.Contains("combined")) type = UnitType.CombinedArms;
-		else if (designation.Contains("weapons")) {
+		else if (Regex.IsMatch(designation, ".*(?:weapons.*|airborne$)")) {
 			if (Regex.IsMatch(designation, ".*(?:mechanized|armoured).*")) type = UnitType.InfantryMechanized;
 			else if (Regex.IsMatch(designation, ".*motorized.*")) type = UnitType.InfantryMotorized;
 			else if (Regex.IsMatch(designation, ".*(?:marine|amphi).*")) type = UnitType.InfantryAmphibious;
@@ -267,15 +279,12 @@ public class Info {
 			if (Regex.IsMatch(designation, ".*(?:mechanized|armoured|medium|heavy).*")) type = UnitType.ArmouredAmphibious;
 			else type = UnitType.InfantryAmphibious;
 		} else if (designation.Contains("sniper")) type = UnitType.Sniper;
-		else if (designation.Contains("air assault")) type = UnitType.AirAssault;
+		else if (Regex.IsMatch(designation, ".*air assault$")) type = UnitType.AirAssault;
 		else if (designation.Contains("security")) {
-			if (Regex.IsMatch(designation, ".*(?:air|aerial).*")) {
-				return (UnitType.SecurityPoliceAir, "#80e0ff");
-			} else if (designation.Contains("motorized")) {
-				type = UnitType.SecurityMotorized;
-			} else {
-				type = UnitType.Security;
-			}
+			if (Regex.IsMatch(designation, ".*(?:air|aerial).*")) return (UnitType.SecurityPoliceAir, "#80e0ff");
+			else if (designation.Contains("motorized")) type = UnitType.SecurityMotorized;
+			else if (designation.Contains("armoured")) type = UnitType.SecurityArmoured;
+			else type = UnitType.Security;
 		} else if (Regex.IsMatch(designation, ".*space$")) type = UnitType.Space;
 		else if (designation.Contains("dog")) type = UnitType.Dog;
 		else colour = "#ffd00b"; //Cavalry
@@ -290,7 +299,7 @@ public class Info {
 			if (Regex.IsMatch(designation, ".*(?:armoured|mechanized).*")) type = UnitType.Armoured;
 		} else if (Regex.IsMatch(designation, ".*reconnaissance$")) {
 			if (designation.Contains("nbcr")) type = UnitType.Empty;
-			else if (designation.Contains("armoured")) type = UnitType.ReconnaissanceArmoured;
+			else if (Regex.IsMatch(designation, ".*(?:armoured|mechanized).*")) type = UnitType.ReconnaissanceArmoured;
 			else if (designation.Contains("amph")) type = UnitType.ReconnaissanceAmphibious;
 			else if (designation.Contains("motor")) type = UnitType.ReconnaissanceMotorized;
 			else type = UnitType.Reconnaissance;
