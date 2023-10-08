@@ -7,10 +7,13 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEditor;
+using SFB;
+using UnityEngine.Rendering;
 
 public class FileManager : MonoBehaviour {
 	//File
 	private string filePath;
+	private string[] filePaths;
 	private readonly List<Unit> unitDatabase = new();
 
 	//UI
@@ -36,6 +39,9 @@ public class FileManager : MonoBehaviour {
 		dropdown.AddOptions(new List<string>(enumNames));
 		dropdown.value = GetTier();
 
+		Screen.fullScreen = false;
+
+		
 #if UNITY_EDITOR_OSX
 		filePath = "/Users/toonu/Downloads/Iconian Order of Battle - OOB.csv";
 #elif UNITY_EDITOR
@@ -47,26 +53,64 @@ public class FileManager : MonoBehaviour {
 #endif
 		LoadCSVFile();
 
-		UnitIdentificator = "army";
-		ParseJSONFile("Army");
-		UnitIdentificator = "air";
-		ParseJSONFile("Air Force");
-		UnitIdentificator = "navy";
-		ParseJSONFile("Navy");
-		Tier = UnitTier.XXX;
-		UnitIdentificator = "Corp";
-		ParseJSONFile("Marine Corps");
-		Tier = UnitTier.XX;
+		//UnitIdentificator = "army";
+		//ParseJSONFile("XXXX - Army");
+		//UnitIdentificator = "air";
+		//ParseJSONFile("XXXX - Air Force");
+		//UnitIdentificator = "navy";
+		//ParseJSONFile("XXXX - Navy");
+		//Tier = UnitTier.XXX;
+		//UnitIdentificator = "Corp";
+		//ParseJSONFile("XXX - Marine Corps");
+		/*Tier = UnitTier.XX;
 		UnitIdentificator = "sup";
-		ParseJSONFile("Support Command");
-		Tier = UnitTier.XX;
-		UnitIdentificator = "aerospace";
-		ParseJSONFile("Aerospace Divisions");
+		ParseJSONFile("XX - Support Command");
+		UnitIdentificator = "Aerospace Control";
+		ParseJSONFile("XX - Aerospace Control");
+		UnitIdentificator = "Home Defence Reserve";
+		ParseJSONFile("XX - Home Defence Reserve");
+		UnitIdentificator = "Home Defence";
+		ParseJSONFile("XX - Home Defence");*/
+		Tier = UnitTier.X;
+		UnitIdentificator = "7";
+		ParseJSONFile("7th Marine Reserve");
+		UnitIdentificator = "8";
+		ParseJSONFile("8th Missile Defense");
+		UnitIdentificator = "9";
+		ParseJSONFile("9th Aerospace Intelligence");
+		UnitIdentificator = "16";
+		ParseJSONFile("16th School Decimus");
+		UnitIdentificator = "17";
+		ParseJSONFile("17th Logistic");
+		UnitIdentificator = "18";
+		ParseJSONFile("18th Medical Treatment");
+		UnitIdentificator = "19";
+		ParseJSONFile("19th Military Intelligence");
+		UnitIdentificator = "20";
+		ParseJSONFile("20th Engineer");
+		UnitIdentificator = "21";
+		ParseJSONFile("21st Air Assault");
+		UnitIdentificator = "22";
+		ParseJSONFile("22nd SOF");
+		UnitIdentificator = "23";
+		ParseJSONFile("23rd Artillery Brigade");
+		UnitIdentificator = "26";
+		ParseJSONFile("26th Marine Support");
+		UnitIdentificator = "27";
+		ParseJSONFile("27th Marine Security");
+		UnitIdentificator = "28";
+		ParseJSONFile("28th Transportation");
+		UnitIdentificator = "29";
+		ParseJSONFile("29th NBCR");
+		UnitIdentificator = "32";
+		ParseJSONFile("32nd Information Operations");
+
 #if UNITY_EDITOR
 		EditorApplication.ExitPlaymode();
 #else
 		Application.Quit();
 #endif
+
 	}
 
 	public void LoadCSVFile() {
@@ -75,7 +119,7 @@ public class FileManager : MonoBehaviour {
 		popup.gameObject.SetActive(true);
 		List<string> csvRows;
 		try {
-			if (filePath == null || filePath == "") filePath = EditorUtility.OpenFilePanel("Open File", "", ""); if (filePath == null || filePath == "") return;
+			if (filePath == null || filePath == "") { filePaths = StandaloneFileBrowser.OpenFilePanel("Open File", "", "", false); filePath = filePaths[0]; } if (filePath == null || filePath == "") return;
 			csvRows = File.ReadAllLines(filePath, Encoding.Default).ToList();
 			unitDatabase.Clear();
 		} catch (Exception e) {
@@ -161,7 +205,7 @@ public class FileManager : MonoBehaviour {
 
 	private void SwapColour(Unit unit) {
 		foreach (Unit subordinate in unit.subordinates) {
-			if (subordinate.info.unitType == UnitType.Empty || subordinate.info.m1 == Modifier1.HQ || subordinate.info.unitType == UnitType.Infantry || subordinate.info.unitType >= UnitType.CV || subordinate.info.m1 == Modifier1.Weapons) {
+			if (subordinate.info.unitType == UnitType.Empty || subordinate.info.m1 == Modifier1.HQ || subordinate.info.unitType >= UnitType.CV || subordinate.info.m1 == Modifier1.Weapons) {
 				subordinate.info.fillColor = unit.info.fillColor;
 			}
 			SwapColour(subordinate);
