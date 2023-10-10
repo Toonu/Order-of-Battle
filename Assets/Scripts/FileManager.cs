@@ -72,6 +72,12 @@ public class FileManager : MonoBehaviour {
 		UnitIdentificator = "Home Defence";
 		ParseJSONFile("XX - Home Defence");*/
 		Tier = UnitTier.X;
+		UnitIdentificator = "Light";
+		ParseJSONFile("Light Marine Brigade");
+		UnitIdentificator = "Medium";
+		ParseJSONFile("Medium Marine Brigade");
+		UnitIdentificator = "Heavy";
+		ParseJSONFile("Heavy Marine Brigade");
 		UnitIdentificator = "7";
 		ParseJSONFile("7th Marine Reserve");
 		UnitIdentificator = "8";
