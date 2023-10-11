@@ -55,9 +55,9 @@ public class FileManager : MonoBehaviour {
 
 		foreach (Unit unit in unitDatabase) {
 			if (unit.info.unitTier > UnitTier.III && unit.info.unitTier < UnitTier.XX) {
-				UnitIdentificator = unit.info.fullDesignation.ToLower();
+				UnitIdentificator = unit.info.FullDesignation.ToLower();
 				Tier = unit.info.unitTier;
-				ParseJSONFile($"{EnumUtils.ParseTier(unit.info.unitTier),5} {unit.info.fullDesignation}");
+				ParseJSONFile($"{EnumUtils.ParseTier(unit.info.unitTier),5} {unit.info.FullDesignation}");
 			}
 		}
 
@@ -107,7 +107,7 @@ public class FileManager : MonoBehaviour {
 		if (string.IsNullOrEmpty(UnitIdentificator)) { UnitIdentificator = unitDatabase[0].info.designation; Tier = unitDatabase[0].info.unitTier; }
 
 		foreach (var candidateUnit in unitDatabase) {
-			if (unit == null && candidateUnit.info.unitTier == Tier && (candidateUnit.info.ID == UnitIdentificator || candidateUnit.info.fullDesignation.ToLower().Contains(UnitIdentificator.ToLower()))) {
+			if (unit == null && candidateUnit.info.unitTier == Tier && (candidateUnit.info.ID == UnitIdentificator || candidateUnit.info.FullDesignation.ToLower().Contains(UnitIdentificator.ToLower()))) {
 				unit = candidateUnit;
 				units.Add(candidateUnit);
 			} else if (unit != null && candidateUnit.info.unitTier >= Tier) {

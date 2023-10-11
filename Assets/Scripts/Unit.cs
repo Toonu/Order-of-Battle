@@ -32,8 +32,8 @@ public class Info {
 	public string sidc;
 
 	[JsonProperty("uniqueDesignation")]
-	public string fullDesignation {
-		set { fullDesignation = value; }
+	public string FullDesignation {
+		set { FullDesignation = value; }
 		get { return $"{(UnitTier.Empty == unitTier ? ID : (Regex.IsMatch(tierText, ".*(base|instit).*") ? "" : AddOrdinalSuffix(ID)))} {designation} {(Regex.IsMatch(designation.ToLower(), ".*(school.*|academ.*|instit.*|command$|facility$|hospital$|centre$|depot$|storage$|administration$|station$|post$|base$|unit$|admiralty$|classis.*|ducenarii.*|corpo.*|copiis.*|branch.*|shop.*|team.*|group.*)") ? "" : tierText)}"; }
 	}
 	[JsonProperty("stack")]
@@ -54,7 +54,9 @@ public class Info {
 	[JsonIgnore]
 	public readonly Modifier2 m2;
 	[JsonIgnore]
-	Domain domain;
+	public readonly Domain domain;
+	[JsonIgnore]
+	public string notes = "";
 
 	[JsonProperty("additionalInformation")]
 	public string additionalInformation;
@@ -89,17 +91,18 @@ public class Info {
 		this.ID = ID;
 		this.designation = designation;
 		this.tierText = tierText;
+		this.notes = notes;
 		if (additionalInformation != null && additionalInformation != "") this.additionalInformation = additionalInformation;
-		if (notes != null && notes != "") { if (Regex.IsMatch(notes, "^[Rr]eserve.*")) isReserve = true; } else { notes = ""; }
+		if (notes != null && notes != "") { if (Regex.IsMatch(notes, "^[Rr]eserve.*")) isReserve = true; }
 
 		if (unitTier == UnitTier.Empty) { //Ships
 			if (Regex.IsMatch(tierText.ToUpper(), "^S(S|O)")) domain = Domain.submarine; else { domain = Domain.naval; }
 			fillColor = "#0065bd";
 			Enum.TryParse(tierText.ToUpper(), out unitType);
 		} else {
-			(unitType, fillColor) = ConvertIDToType(designation, tierText);
-			m1 = SetModifier1(designation, notes, tierText);
-			m2 = SetModifier2(designation, tierText);
+			(unitType, fillColor) = ConvertIDToType(this);
+			m1 = SetModifier1(this);
+			m2 = SetModifier2(this);
 		}
 
 		sidc = CalculateSIDC();
@@ -109,9 +112,9 @@ public class Info {
 		return "3003" + (int)domain + (isReserve ? 1 : 0) + "0" + $"{(int)unitTier:D2}" + $"{(int)unitType:D6}" + (domain == Domain.land ? $"{(int)m1:D2}" + $"{(int)m2:D2}" : "");
 	}
 
-	public Modifier1 SetModifier1(string designation, string notes, string tierText) {
-		tierText = tierText.ToLower();
-		designation = designation.ToLower();
+	public Modifier1 SetModifier1(Info unit) {
+		tierText = unit.tierText.ToLower();
+		designation = unit.designation.ToLower();
 		if (Regex.IsMatch(designation, ".*(support command).*")) return Modifier1.Army;
 		if (Regex.IsMatch(designation, "^(?=(.*?(hq|headquarters|hh|admiralty|command|praesidium|institute|directorate|department|medical support adm|c\\d).*))(?!.*secu)")) return Modifier1.HQ;
 		if (designation.Contains("fighter")) return Modifier1.Force;
@@ -140,10 +143,10 @@ public class Info {
 
 		if (Regex.IsMatch(designation, ".*medic.*(evac|trans).*")) return Modifier1.MEDEVAC;
 		if (Regex.IsMatch(designation, ".*[^c]sar.*")) return Modifier1.SAR;
-		if (Regex.IsMatch(notes, ".*[rR]ole.1.*")) return Modifier1.MED1;
-		if (Regex.IsMatch(notes, ".*[rR]ole.2.*")) return Modifier1.MED2;
-		if (Regex.IsMatch(notes, ".*[rR]ole.3.*")) return Modifier1.MED3;
-		if (Regex.IsMatch(notes, ".*[rR]ole.4.*")) return Modifier1.MED4;
+		if (Regex.IsMatch(unit.notes, ".*[rR]ole.1.*")) return Modifier1.MED1;
+		if (Regex.IsMatch(unit.notes, ".*[rR]ole.2.*")) return Modifier1.MED2;
+		if (Regex.IsMatch(unit.notes, ".*[rR]ole.3.*")) return Modifier1.MED3;
+		if (Regex.IsMatch(unit.notes, ".*[rR]ole.4.*")) return Modifier1.MED4;
 		if (Regex.IsMatch(designation, ".*combat.*eng.*")) return Modifier1.Combat;
 
 		if (designation.Contains("brigade")) return Modifier1.Brigade;
@@ -171,9 +174,9 @@ public class Info {
 		return Modifier1.Empty;
 	}
 
-	public Modifier2 SetModifier2(string designation, string tierText) {
-		designation = designation.ToLower();
-		tierText = tierText.ToLower();
+	public Modifier2 SetModifier2(Info unit) {
+		designation = unit.designation.ToLower();
+		tierText = unit.tierText.ToLower();
 		if (Regex.IsMatch(designation, ".*(?:airborne|parachut).*")) return Modifier2.Airborne;
 		if (Regex.IsMatch(designation, ".*(?:wheeled|motorized.*hh|medium marine|sph|self-propelled art).*")) return Modifier2.Wheeled;
 		if (designation.Contains("tracked")) return Modifier2.Tracked;
@@ -208,13 +211,13 @@ public class Info {
 		return Modifier2.Empty;
 	}
 
-	public static (UnitType, string) ConvertIDToType(string designation, string tierText) {
-		designation = designation.ToLower();
+	public static (UnitType, string) ConvertIDToType(Info unit) {
+		string designation = unit.designation.ToLower();
 		UnitType type = UnitType.Empty;
 		string colour = "#5baa5b";
 
 		//Echelon matching
-		switch (tierText.ToLower()) {
+		switch (unit.tierText.ToLower()) {
 			case "brigade":
 				if (designation.Contains("school")) return (UnitType.AviationFixedWing, "#80e0ff");
 				break;
