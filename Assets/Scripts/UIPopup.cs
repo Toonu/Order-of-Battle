@@ -3,16 +3,18 @@ using System.Collections;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIPopup : MonoBehaviour {
+	private GameObject popupObject;
 	private TextMeshProUGUI textLabelUI; //Popup UI for the text label.
 
 	/// <summary>
 	/// Method sets up the Components on startup and switches the popup off.
 	/// </summary>
 	void Awake() {
-		textLabelUI = GetComponentInChildren<TextMeshProUGUI>();
-		gameObject.SetActive(false);
+		textLabelUI = transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>();
+		popupObject = transform.GetChild(0).gameObject;
 	}
 
 	/// <summary>
@@ -22,7 +24,7 @@ public class UIPopup : MonoBehaviour {
 	/// <param name="duration">Float time duration in seconds</param>
 	public void PopUp(string title = "Error!", float duration = 1.75f) {
 		textLabelUI.text = title;
-		gameObject.SetActive(true);
+		popupObject.SetActive(true);
 		StartCoroutine(Begone(duration));
 	}
 
@@ -34,9 +36,9 @@ public class UIPopup : MonoBehaviour {
 	/// <returns></returns>
 	public async Task PopUpAsync(string title = "Error!", float duration = 1.75f) {
 		textLabelUI.text = title;
-		gameObject.SetActive(true);
+		popupObject.SetActive(true);
 		await Task.Delay(Convert.ToInt16(duration) * 1000);
-		gameObject.SetActive(false);
+		popupObject.SetActive(false);
 	}
 
 	/// <summary>
@@ -46,6 +48,25 @@ public class UIPopup : MonoBehaviour {
 	/// <returns></returns>
 	private IEnumerator Begone(float duration) {
 		yield return new WaitForSeconds(duration);
-		gameObject.SetActive(false);
+		popupObject.SetActive(false);
+	}
+
+	/// <summary>
+	/// Method pops up the Popup for the specified duration with textLabelUI.
+	/// </summary>
+	/// <param name="title">String textLabelUI to show</param>
+	/// <param name="duration">Float time duration in seconds</param>
+	public void PopUpSticky(string title = "Error!") {
+		textLabelUI.text = title;
+		popupObject.SetActive(true);
+		Button button = popupObject.GetComponentInChildren<Button>();
+		if (button != null) button.onClick.AddListener(() => { popupObject.SetActive(false); button.onClick.RemoveAllListeners(); });
+	}
+
+	/// <summary>
+	/// Closes sticky popup.
+	/// </summary>
+	public void CloseSticky() {
+		popupObject.SetActive(false);
 	}
 }

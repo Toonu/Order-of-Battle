@@ -17,30 +17,40 @@ public class FileManager : MonoBehaviour {
 	private readonly List<Unit> unitDatabase = new();
 
 	//UI
-	public TMP_Dropdown dropdown;
 	public UIPopup popup;
+	private TMP_InputField foundUnit;
 
 	//Assignable by user
-	public string UnitIdentificator { get; set; }
+	public string SearchedIdentificator { get; set; }
 	public string UnitName { get; set; }
 	public string UnitTierText { get; set; }
-	public UnitTier Tier;
-	public void SetTier(int value) { Tier = (UnitTier)value + 10 + (value > 8 ? 2 : 0); } //UnitTier shift
-	public int GetTier() { return (int)Tier - 10 - (Tier > UnitTier.X ? 2 : 0); } //UnitTier shift
+	public UnitTier SearchedTier;
+	public UnitTier MinTier;
+	private Unit SearchedUnit;
+	public void SetTier(int value) { SearchedTier = (UnitTier)value + 10 + (value > 8 ? 2 : 0); } //UnitTier shift
+	public int GetTier() { return (int)SearchedTier - 10 - (SearchedTier > UnitTier.X ? 2 : 0); } //UnitTier shift
+
+	public void SetMinTier(int value) { MinTier = (UnitTier)value + 10 + (value > 8 ? 2 : 0); } //UnitTier shift
+	public int GetMinTier() { return (int)MinTier - 10 - (MinTier > UnitTier.X ? 2 : 0); } //UnitTier shift
 
 	private void Start() {
-		dropdown.ClearOptions();
+		TMP_Dropdown dropdownTier = gameObject.transform.parent.parent.Find("Tier/Tier").GetComponent<TMP_Dropdown>();
+		TMP_Dropdown dropdownMinTier = gameObject.transform.parent.parent.Find("MinTier/MinTier").GetComponent<TMP_Dropdown>();
+		foundUnit = gameObject.transform.parent.parent.Find("Unit").GetChild(0).GetComponent<TMP_InputField>();
+		dropdownTier.ClearOptions();
+		dropdownMinTier.ClearOptions();
 
 		UnitTier[] enumValues = (UnitTier[])Enum.GetValues(typeof(UnitTier));
 		string[] enumNames = new string[enumValues.Length];
 		for (int i = 1; i < enumValues.Length; i++) {
 			enumNames[i] = enumValues[i].ToString();
 		}
-		dropdown.AddOptions(new List<string>(enumNames));
-		dropdown.value = GetTier();
+		dropdownTier.AddOptions(new List<string>(enumNames));
+		dropdownMinTier.AddOptions(new List<string>(enumNames));
+		dropdownTier.value = GetTier();
+		dropdownMinTier.value = GetMinTier();
 
-		Screen.fullScreen = false;
-
+		Screen.SetResolution(Screen.currentResolution.width/2, Screen.currentResolution.height/2, FullScreenMode.Windowed);
 		
 #if UNITY_EDITOR_OSX
 		filePath = "/Users/toonu/Downloads/Iconian Order of Battle - OOB.csv";
@@ -53,27 +63,33 @@ public class FileManager : MonoBehaviour {
 #endif
 		LoadCSVFile();
 
+		//Automatic printout of units of Brigade level
 		foreach (Unit unit in unitDatabase) {
 			if (unit.info.unitTier > UnitTier.III && unit.info.unitTier < UnitTier.XX) {
-				UnitIdentificator = unit.info.FullDesignation.ToLower();
-				Tier = unit.info.unitTier;
-				ParseJSONFile($"{EnumUtils.ParseTier(unit.info.unitTier),5} {unit.info.FullDesignation}");
+				SearchedUnit = unit;
+				ParseJSONFile();
 			}
 		}
-
 
 #if UNITY_EDITOR
 		EditorApplication.ExitPlaymode();
 #else
 		Application.Quit();
 #endif
+		
+	}
 
+	public void FindUnit() {
+		foreach (Unit unit in unitDatabase) {
+			if (unit.info.unitTier == SearchedTier && unit.info.FullDesignation.Contains(SearchedIdentificator)) {
+				SearchedUnit = unit;
+				foundUnit.text = unit.info.FullDesignation;
+			}
+		}
 	}
 
 	public void LoadCSVFile() {
 		unitDatabase.Clear();
-		popup.PopUp("Loading!", 0);
-		popup.gameObject.SetActive(true);
 		List<string> csvRows;
 		try {
 			if (filePath == null || filePath == "") { filePaths = StandaloneFileBrowser.OpenFilePanel("Open File", "", "", false); filePath = filePaths[0]; } if (filePath == null || filePath == "") return;
@@ -93,36 +109,34 @@ public class FileManager : MonoBehaviour {
 				unitDatabase.Add(new(new Info(fields[1], fields[2], fields[3], fields[0], fields[4])));
 			}
 		}
-		popup.gameObject.SetActive(false);
 		Debug.Log("Import finished");
 	}
 
-	public void ParseJSONFile(string fileName = "Units") {
-		if (unitDatabase.Count == 0) { popup.PopUp("First load your unit file!", 5); return; }
+	public void ParseJSONFile() {
+		if (unitDatabase.Count == 0) { popup.PopUp("First load your unit file!", 2); return; }
 
 		//Finding unit and creating list of its subordinate units.
 		List<Unit> units = new();
 		Unit unit = null;
+		popup.PopUpSticky("Exporting!");
+
 		//When no searched unit assigned
-		if (string.IsNullOrEmpty(UnitIdentificator)) { UnitIdentificator = unitDatabase[0].info.designation; Tier = unitDatabase[0].info.unitTier; }
+		if (string.IsNullOrEmpty(SearchedIdentificator) && SearchedUnit == null) { SearchedIdentificator = unitDatabase[0].info.designation; SearchedTier = unitDatabase[0].info.unitTier; }
 
 		foreach (var candidateUnit in unitDatabase) {
-			if (unit == null && candidateUnit.info.unitTier == Tier && (candidateUnit.info.ID == UnitIdentificator || candidateUnit.info.FullDesignation.ToLower().Contains(UnitIdentificator.ToLower()))) {
+			if (unit == null && candidateUnit.info.ID == SearchedUnit.info.ID && candidateUnit.info.designation == SearchedUnit.info.designation) {
 				unit = candidateUnit;
 				units.Add(candidateUnit);
-			} else if (unit != null && candidateUnit.info.unitTier >= Tier) {
+			} else if (unit != null && candidateUnit.info.unitTier >= SearchedTier) {
 				break;
-			} else if (unit != null) {
+			} else if (unit != null && candidateUnit.info.unitTier >= MinTier) {
 				units.Add(candidateUnit);
 			}
 		}
 		if (unit == null) { popup.PopUp("Unit not found! Unit number is checked or its description!", 5); return; }
 
-		popup.PopUp("Exporting!", 0);
-		popup.gameObject.SetActive(true);
-
 		//Create a hierarchy of units
-		Dictionary<UnitTier, int> currentUnits = new() {{ Tier, 0 }};
+		Dictionary<UnitTier, int> currentUnits = new() {{ SearchedTier, 0 }};
 		for (int position = 1; position < units.Count; position++) {
 			currentUnits[units[position].info.unitTier] = position;
 			units[FindHigherEchelon(units[position], currentUnits, position)].subordinates.Add(units[position]);
@@ -148,7 +162,7 @@ public class FileManager : MonoBehaviour {
 			}
 		}		
 
-		ExportJSON(unit, fileName);
+		ExportJSON(unit, $"{EnumUtils.ParseTier(unit.info.unitTier),5} {unit.info.FullDesignation}");
 
 		//Cleanup
 		foreach (Unit u in units) {
@@ -156,7 +170,7 @@ public class FileManager : MonoBehaviour {
 		}
 		unit.subordinates.Clear();
 		units.Clear();
-		popup.gameObject.SetActive(false);
+		popup.CloseSticky();
 		Debug.Log("Export complete!");
 	}
 

@@ -108,13 +108,18 @@ public class Info {
 		sidc = CalculateSIDC();
 	}
 
+
+	public override string ToString() {
+		return FullDesignation;
+	}
+
 	public string CalculateSIDC() {
 		return "3003" + (int)domain + (isReserve ? 1 : 0) + "0" + $"{(int)unitTier:D2}" + $"{(int)unitType:D6}" + (domain == Domain.land ? $"{(int)m1:D2}" + $"{(int)m2:D2}" : "");
 	}
 
-	public Modifier1 SetModifier1(Info unit) {
-		tierText = unit.tierText.ToLower();
-		designation = unit.designation.ToLower();
+	public static Modifier1 SetModifier1(Info unit) {
+		string tierText = unit.tierText.ToLower();
+		string designation = unit.designation.ToLower();
 		if (Regex.IsMatch(designation, ".*(support command).*")) return Modifier1.Army;
 		if (Regex.IsMatch(designation, "^(?=(.*?(hq|headquarters|hh|admiralty|command|praesidium|institute|directorate|department|medical support adm|c\\d).*))(?!.*secu)")) return Modifier1.HQ;
 		if (designation.Contains("fighter")) return Modifier1.Force;
@@ -174,9 +179,9 @@ public class Info {
 		return Modifier1.Empty;
 	}
 
-	public Modifier2 SetModifier2(Info unit) {
-		designation = unit.designation.ToLower();
-		tierText = unit.tierText.ToLower();
+	public static Modifier2 SetModifier2(Info unit) {
+		string designation = unit.designation.ToLower();
+		string tierText = unit.tierText.ToLower();
 		if (Regex.IsMatch(designation, ".*(?:airborne|parachut).*")) return Modifier2.Airborne;
 		if (Regex.IsMatch(designation, ".*(?:wheeled|motorized.*hh|medium marine|sph|self-propelled art).*")) return Modifier2.Wheeled;
 		if (designation.Contains("tracked")) return Modifier2.Tracked;
