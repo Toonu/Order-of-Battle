@@ -8,7 +8,7 @@ using System.IO;
 using TMPro;
 using UnityEditor;
 using SFB;
-using UnityEngine.Rendering;
+
 
 public class FileManager : MonoBehaviour {
 	//File
@@ -53,63 +53,14 @@ public class FileManager : MonoBehaviour {
 #endif
 		LoadCSVFile();
 
-		//UnitIdentificator = "army";
-		//ParseJSONFile("XXXX - Army");
-		//UnitIdentificator = "air";
-		//ParseJSONFile("XXXX - Air Force");
-		//UnitIdentificator = "navy";
-		//ParseJSONFile("XXXX - Navy");
-		//Tier = UnitTier.XXX;
-		//UnitIdentificator = "Corp";
-		//ParseJSONFile("XXX - Marine Corps");
-		/*Tier = UnitTier.XX;
-		UnitIdentificator = "sup";
-		ParseJSONFile("XX - Support Command");
-		UnitIdentificator = "Aerospace Control";
-		ParseJSONFile("XX - Aerospace Control");
-		UnitIdentificator = "Home Defence Reserve";
-		ParseJSONFile("XX - Home Defence Reserve");
-		UnitIdentificator = "Home Defence";
-		ParseJSONFile("XX - Home Defence");*/
-		Tier = UnitTier.X;
-		UnitIdentificator = "Light";
-		ParseJSONFile("Light Marine Brigade");
-		UnitIdentificator = "Medium";
-		ParseJSONFile("Medium Marine Brigade");
-		UnitIdentificator = "Heavy";
-		ParseJSONFile("Heavy Marine Brigade");
-		UnitIdentificator = "7";
-		ParseJSONFile("7th Marine Reserve");
-		UnitIdentificator = "8";
-		ParseJSONFile("8th Missile Defense");
-		UnitIdentificator = "9";
-		ParseJSONFile("9th Aerospace Intelligence");
-		UnitIdentificator = "16";
-		ParseJSONFile("16th School Decimus");
-		UnitIdentificator = "17";
-		ParseJSONFile("17th Logistic");
-		UnitIdentificator = "18";
-		ParseJSONFile("18th Medical Treatment");
-		UnitIdentificator = "19";
-		ParseJSONFile("19th Military Intelligence");
-		UnitIdentificator = "20";
-		ParseJSONFile("20th Engineer");
-		UnitIdentificator = "21";
-		ParseJSONFile("21st Air Assault");
-		UnitIdentificator = "22";
-		ParseJSONFile("22nd SOF");
-		UnitIdentificator = "23";
-		ParseJSONFile("23rd Artillery Brigade");
-		UnitIdentificator = "26";
-		ParseJSONFile("26th Marine Support");
-		UnitIdentificator = "27";
-		ParseJSONFile("27th Marine Security");
-		UnitIdentificator = "28";
-		ParseJSONFile("28th Transportation");
-		UnitIdentificator = "29";
-		ParseJSONFile("29th NBCR");
-		UnitIdentificator = "32";
-		ParseJSONFile("32nd Information Operations");
+		foreach (Unit unit in unitDatabase) {
+			if (unit.info.unitTier > UnitTier.III && unit.info.unitTier < UnitTier.XX) {
+				UnitIdentificator = unit.info.fullDesignation.ToLower();
+				Tier = unit.info.unitTier;
+				ParseJSONFile($"{EnumUtils.ParseTier(unit.info.unitTier),5} {unit.info.fullDesignation}");
+			}
+		}
+
 
 #if UNITY_EDITOR
 		EditorApplication.ExitPlaymode();

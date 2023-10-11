@@ -264,3 +264,42 @@ public enum Modifier1 {
 public enum Modifier2 {
 	Empty = 0, Airborne, Arctic, BattleDamageRepair, Bicycle, CasualtyStaging, Clearing, CloseRange, Control, Decontamination, Demolition, Dental, Digital, EnhancedPositionLocationReportingSystem, Equipment, Heavy, HighAltitude, Intermodal, IntensiveCare, Light, Laboratory, Launcher, LongRange, LowAltitude, Medium, MediumAltitude, MediumRange, Mountain, HighToMediumAltitude, MultiChannel, Optical, PackAnimal, Medevac, PreventiveMaint, Psychological, RadioRelay, Railroad, RecoveryUnmannedSystems, RecoveryMaintenance, RescueCoordinationCentre, Riverine, SingleChannel, Ski, ShortRange, Strategic, Support, Tactical, Towed, Troop, VSTOL, Veterinary, Wheeled, HighToLowAltitude, MediumToLowAltitude, Attack, Refuel, Utility, CSAR, Guerilla, AirAssault, Amphibious, VeryHeavy, Supply, Cyberspace, Tug, Barge, Launch, LC, LST, ServiceCraft, TugHarbour, TugOceangoing, SurfaceDeploymentDistributionCmd, Vessel, Composite, Shelter, LightMedium, Tracked
 }
+
+public class EnumUtils {
+	public static string ParseTier(UnitTier tier) {
+		switch (tier) {
+			case UnitTier.Empty:
+				return "";
+			case UnitTier.Team:
+				return "∅";
+			case UnitTier.Squad:
+				return "●";
+			case UnitTier.Section:
+				return "●●";
+			case UnitTier.Platoon:
+				return "●●●";
+			case UnitTier.I:
+				return "I";
+			case UnitTier.II:
+				return "II";
+			case UnitTier.III:
+				return "III";
+			case UnitTier.X:
+				return "X";
+			case UnitTier.XX:
+				return "XX";
+			case UnitTier.XXX:
+				return "XXX";
+			case UnitTier.XXXX:
+				return "XXXX";
+			case UnitTier.XXXXX:
+				return "XXXXX";
+			case UnitTier.XXXXXX:
+				return "XXXXXX";
+			case UnitTier.Command:
+				return "++";
+			default:
+				return "";
+		}
+	}
+}
