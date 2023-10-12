@@ -65,7 +65,7 @@ public class FileManager : MonoBehaviour {
 
 		//Automatic printout of units of Brigade level
 		foreach (Unit unit in unitDatabase) {
-			if (unit.info.unitTier > UnitTier.III && unit.info.unitTier < UnitTier.XX) {
+			if (unit.info.unitTier > UnitTier.III) {
 				SearchedUnit = unit;
 				ParseJSONFile();
 			}
@@ -127,7 +127,7 @@ public class FileManager : MonoBehaviour {
 			if (unit == null && candidateUnit.info.ID == SearchedUnit.info.ID && candidateUnit.info.designation == SearchedUnit.info.designation) {
 				unit = candidateUnit;
 				units.Add(candidateUnit);
-			} else if (unit != null && candidateUnit.info.unitTier >= SearchedTier) {
+			} else if (unit != null && candidateUnit.info.unitTier >= SearchedUnit.info.unitTier) {
 				break;
 			} else if (unit != null && (candidateUnit.info.unitTier >= MinTier || candidateUnit.info.domain != Domain.land)) {
 				units.Add(candidateUnit);
@@ -136,7 +136,7 @@ public class FileManager : MonoBehaviour {
 		if (unit == null) { popup.PopUp("Unit not found! Unit number is checked or its description!", 5); return; }
 
 		//Create a hierarchy of units
-		Dictionary<UnitTier, int> currentUnits = new() {{ SearchedTier, 0 }};
+		Dictionary<UnitTier, int> currentUnits = new() {{ SearchedUnit.info.unitTier, 0 }};
 		for (int position = 1; position < units.Count; position++) {
 			currentUnits[units[position].info.unitTier] = position;
 			units[FindHigherEchelon(units[position], currentUnits, position)].subordinates.Add(units[position]);
@@ -160,7 +160,14 @@ public class FileManager : MonoBehaviour {
 				currentUnit.subordinates.Remove(HQ);
 				currentUnit.subordinates.Insert(0, HQ);
 			}
-		}		
+		}
+
+
+		//Command check
+		if (units.First().info.unitTier > UnitTier.III && units.First().info.FullDesignation.ToLower().Contains("command")) {
+			units.First().info.unitTier = UnitTier.Command;
+			units.First().info.sidc = units.First().info.CalculateSIDC();
+		}
 
 		ExportJSON(unit, $"{EnumUtils.ParseTier(unit.info.unitTier),5} {unit.info.FullDesignation}");
 

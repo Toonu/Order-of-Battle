@@ -131,6 +131,7 @@ public class Info {
 		if (designation.Contains("aviation")) return Modifier1.Aviation;
 		if (designation.Contains("uav") && unit.unitType != UnitType.UnmannedAerialVehicle) return Modifier1.UAV;
 		if (Regex.IsMatch(designation, ".*(naval|anti-ship|coastal).*")) return Modifier1.Naval;
+		if (designation.Contains("shoreline")) return Modifier1.AmphibiousShip;
 
 		if (designation.Contains("rocket")) return Modifier1.MLRS;
 		if (designation.Contains("strategic artillery")) return Modifier1.Missile;
