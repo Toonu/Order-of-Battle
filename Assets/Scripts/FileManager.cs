@@ -129,7 +129,7 @@ public class FileManager : MonoBehaviour {
 				units.Add(candidateUnit);
 			} else if (unit != null && candidateUnit.info.unitTier >= SearchedTier) {
 				break;
-			} else if (unit != null && candidateUnit.info.unitTier >= MinTier) {
+			} else if (unit != null && (candidateUnit.info.unitTier >= MinTier || candidateUnit.info.domain != Domain.land)) {
 				units.Add(candidateUnit);
 			}
 		}

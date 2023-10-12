@@ -129,7 +129,7 @@ public class Info {
 			else return Modifier1.Utility;
 		}
 		if (designation.Contains("aviation")) return Modifier1.Aviation;
-		if (designation.Contains("uav")) return Modifier1.UAV;
+		if (designation.Contains("uav") && unit.unitType != UnitType.UnmannedAerialVehicle) return Modifier1.UAV;
 		if (Regex.IsMatch(designation, ".*(naval|anti-ship|coastal).*")) return Modifier1.Naval;
 
 		if (designation.Contains("rocket")) return Modifier1.MLRS;
@@ -430,8 +430,7 @@ public class Info {
 			else if (Regex.IsMatch(designation, ".*civilian.*")) type = UnitType.Class10;
 			else type = UnitType.Supply;
 		} else if (designation.Contains("feeding")) type = UnitType.Class1;
-		
-
+	
 
 		else if (designation.Contains("railway trans")) type = UnitType.Railhead;
 		else if (designation.Contains("transport")) type = UnitType.Transportation;
