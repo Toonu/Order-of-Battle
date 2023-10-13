@@ -13,7 +13,6 @@ using SFB;
 public class FileManager : MonoBehaviour {
 	//File
 	private string filePath;
-	private string[] filePaths;
 	private readonly List<Unit> unitDatabase = new();
 
 	//UI
@@ -54,6 +53,12 @@ public class FileManager : MonoBehaviour {
 		sortBy.value = 0;
 
 		Screen.SetResolution(Screen.currentResolution.width/2, Screen.currentResolution.height/2, FullScreenMode.Windowed);
+
+		//AutomateImport();
+	}
+
+
+	private void AutomateImport() {
 		
 #if UNITY_EDITOR_OSX
 		filePath = "/Users/toonu/Downloads/Iconian Order of Battle - OOB.csv";
@@ -65,7 +70,7 @@ public class FileManager : MonoBehaviour {
 		filePath = "C:/Users/Toonu/Downloads/Iconian Order of Battle - OOB.csv";
 #endif
 		LoadCSVFile();
-		/*
+		
 		//Automatic printout of units of Brigade level
 		foreach (Unit unit in unitDatabase) {
 			if (unit.info.unitTier > UnitTier.III && unit.info.unitTier < UnitTier.XXX) {
@@ -84,7 +89,7 @@ public class FileManager : MonoBehaviour {
 #else
 		Application.Quit();
 #endif
-		*/
+		
 	}
 
 	public void FindUnit() {
@@ -100,7 +105,7 @@ public class FileManager : MonoBehaviour {
 		unitDatabase.Clear();
 		List<string> csvRows;
 		try {
-			if (filePath == null || filePath == "") { filePaths = StandaloneFileBrowser.OpenFilePanel("Open File", "", "", false); filePath = filePaths[0]; } if (filePath == null || filePath == "") return;
+			filePath ??= StandaloneFileBrowser.OpenFilePanel("Open File", "", new ExtensionFilter[] { new ExtensionFilter("Chart", "csv") }, false)[0];
 			csvRows = File.ReadAllLines(filePath, Encoding.Default).ToList();
 			unitDatabase.Clear();
 		} catch (Exception e) {
@@ -118,6 +123,7 @@ public class FileManager : MonoBehaviour {
 			}
 		}
 		Debug.Log("Import finished");
+		popup.PopUp("File loaded!", 2);
 	}
 
 	public void ParseJSONFile() {
