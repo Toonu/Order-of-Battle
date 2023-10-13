@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 public enum Domain { land = 10, naval = 30, submarine = 35 }
 
@@ -38,6 +39,8 @@ public class Info {
 	}
 	[JsonProperty("stack")]
 	public int stack;
+	[JsonProperty("specialheadquarter")]
+	public string specialheadquarter = "";
 
 	[JsonIgnore]
 	public string ID;
@@ -68,7 +71,7 @@ public class Info {
 	#endregion
 
 	public Info() { }
-	public Info(string ID, string designation, string tierText, string additionalInformation = null, string notes = null) {
+	public Info(string ID, string designation, string tierText, string location = null, string notes = null, string eq = null) {
 		domain = Domain.land; unitType = UnitType.Empty; m1 = Modifier1.Empty; m2 = Modifier2.Empty;
 		unitTier = tierText.ToLower() switch {
 			"team" => UnitTier.Team,
@@ -84,26 +87,28 @@ public class Info {
 			"army" or "navy" or "air force" => UnitTier.XXXX,
 			"armygroup" => UnitTier.XXXXX,
 			"theater" => UnitTier.XXXXXX,
-			"command" => UnitTier.Command,
 			_ => UnitTier.Empty,
 		};
 
-		this.ID = ID;
-		this.designation = designation;
-		this.tierText = tierText;
-		this.notes = notes;
-		if (additionalInformation != null && additionalInformation != "") this.additionalInformation = additionalInformation;
+		this.ID = ID.Trim();
+		this.designation = designation.Trim();
+		this.tierText = tierText.Trim();
+		this.notes = notes.Trim();
+		if (location != null && location != "") additionalInformation = location;
 		if (notes != null && notes != "") { if (Regex.IsMatch(notes, "^[Rr]eserve.*")) isReserve = true; }
 
 		if (unitTier == UnitTier.Empty) { //Ships
 			if (Regex.IsMatch(tierText.ToUpper(), "^S(S|O)")) domain = Domain.submarine; else { domain = Domain.naval; }
 			fillColor = "#0065bd";
+			additionalInformation = eq.Trim();
 			Enum.TryParse(tierText.ToUpper(), out unitType);
 		} else {
 			(unitType, fillColor) = ConvertIDToType(this);
 			m1 = SetModifier1(this);
 			m2 = SetModifier2(this);
 		}
+
+		if (domain == Domain.land && location == "" && eq != null && eq != "") additionalInformation = eq.Trim();
 
 		sidc = CalculateSIDC();
 	}
@@ -121,16 +126,18 @@ public class Info {
 		string tierText = unit.tierText.ToLower();
 		string designation = unit.designation.ToLower();
 		if (Regex.IsMatch(designation, ".*(support command).*")) return Modifier1.Army;
-		if (Regex.IsMatch(designation, "^(?=(.*?(hq|headquarters|hh|admiralty|command|praesidium|institute|directorate|department|medical support adm|c\\d).*))(?!.*secu)")) return Modifier1.HQ;
+		if (Regex.IsMatch(designation, "^(?=(.*?(?:hq|headquarters|hh|admiralty|command|praesidium|institute|directorate|department|medical support adm|c\\d).*))(?!.*secu)")) return Modifier1.HQ;
 		if (designation.Contains("fighter")) return Modifier1.Force;
 		if (designation.Contains("helicopter")) {
-			if (designation.Contains("sar")) { } 
+			if (Regex.IsMatch(designation, ".*(?<!c)sar.*")) return Modifier1.SAR;
 			else if (designation.Contains("attack")) return Modifier1.Attack;
+			else if (Regex.IsMatch(designation, ".*sof.*")) return Modifier1.SOF;
+			else if (Regex.IsMatch(designation, ".*csar.*")) return Modifier1.Empty;
 			else return Modifier1.Utility;
 		}
 		if (designation.Contains("aviation")) return Modifier1.Aviation;
 		if (designation.Contains("uav") && unit.unitType != UnitType.UnmannedAerialVehicle) return Modifier1.UAV;
-		if (Regex.IsMatch(designation, ".*(naval|anti-ship|coastal).*")) return Modifier1.Naval;
+		if (Regex.IsMatch(designation, ".*(?:naval|anti-ship|coastal).*")) return Modifier1.Naval;
 		if (designation.Contains("shoreline")) return Modifier1.AmphibiousShip;
 
 		if (designation.Contains("rocket")) return Modifier1.MLRS;
@@ -143,7 +150,8 @@ public class Info {
 		if (designation.Contains("weapons")) return Modifier1.Weapons;
 		if (designation.Contains("airbase")) return Modifier1.Aifield;
 		if (designation.Contains("bridg")) return Modifier1.Bridging;
-		if (Regex.IsMatch(designation, ".*(drilling).*")) return Modifier1.Drilling;
+		if (Regex.IsMatch(designation, ".*(?:drilling).*")) return Modifier1.Drilling;
+		if (Regex.IsMatch(designation, "(?:.*satellite.*)") && !Regex.IsMatch(tierText, ".*(?:wing|squadron|flight).*")) return Modifier1.TacticalSatellite;
 		if (designation.Contains("network")) return Modifier1.Network;
 		if (Regex.IsMatch(designation, ".*construction(?!depot).*")) return Modifier1.Construction;
 
@@ -167,13 +175,12 @@ public class Info {
 		if (designation.Contains("c2")) return Modifier1.C2;
 		if (designation.Contains("command post")) return Modifier1.CommandPostNode;
 		if (designation.Contains("retransmission")) return Modifier1.RetransmissionSite;
-		if (designation.Contains("sensor")) return Modifier1.Sensor;
+		if (Regex.IsMatch(designation, ".*(?:sensor|space inf).*")) return Modifier1.Sensor;
 		if (designation.Contains("virtual")) return Modifier1.Digital;
-		if (Regex.IsMatch(designation, ".*(electronic installation).*")) return Modifier1.SIGINT;
-		if (Regex.IsMatch(designation, "^space$")) return Modifier1.TacticalSattelite;
-
+		if (Regex.IsMatch(designation, ".*(?:electronic installation).*")) return Modifier1.SIGINT;
+		
 		if (designation.Contains("dog")) return Modifier1.Dog;
-		if (Regex.IsMatch(designation, ".*(radar|missile warn|space (comm|oper)).*")) return Modifier1.Radar;
+		if (Regex.IsMatch(designation, ".*(?:radar|missile warn|space (?:comm|oper)).*")) return Modifier1.Radar;
 		if (designation.Contains("radiofrequency")) return Modifier1.RFID;
 		if (designation.Contains("route	safety")) return Modifier1.RouteReconnaissanceAndClearance;
 
@@ -259,7 +266,13 @@ public class Info {
 				else if (designation.Contains("combined")) type = UnitType.AviationComposite;
 				else if (designation.Contains("uav")) type = UnitType.UnmannedAerialVehicle;
 				else if (designation.Contains("cyber")) return (UnitType.ElectronicWarfare, "#ffffff");
-				else if (designation.Contains("space ")) break;
+				else if (designation.Contains("satellite")) return (UnitType.Sattelite, "#0065bd");
+				else if (Regex.IsMatch(designation, ".*(?:space).*")) {
+					if (designation.Contains("infantry")) return (UnitType.Infantry, "#0065bd");
+					else if (designation.Contains("surve")) return (UnitType.AviationFixedWingReconnaissance, "#0065bd");
+					else if (designation.Contains("comm")) return (UnitType.SignalTacticalSatellite, "#ffffff");
+					return (UnitType.AviationFixedWing, "#0065bd");
+				}
 				else type = UnitType.AviationFixedWing;
 
 				if (designation.Contains("recon")) {
@@ -274,7 +287,7 @@ public class Info {
 		//Name matching
 		#region Maneuvre
 		if (designation.Contains("combined")) type = UnitType.CombinedArms;
-		else if (Regex.IsMatch(designation, ".*(?:weapons.*|airborne$|reserve(?!.*preserv).*|guard.*|yeomenry.*|personnel$)")) {
+		else if (Regex.IsMatch(designation, "(?:^training$|.*(?:weapons.*|airborne$|reserve(?!.*preserv).*|guard.*|yeomenry.*|personnel$))")) {
 			if (Regex.IsMatch(designation, ".*(?:mechanized|armoured).*")) type = UnitType.InfantryMechanized;
 			else if (Regex.IsMatch(designation, ".*motorized.*")) type = UnitType.InfantryMotorized;
 			else if (Regex.IsMatch(designation, ".*(?:marine|amphi).*")) type = UnitType.InfantryAmphibious;
@@ -431,7 +444,7 @@ public class Info {
 			else if (Regex.IsMatch(designation, ".*civilian.*")) type = UnitType.Class10;
 			else type = UnitType.Supply;
 		} else if (designation.Contains("feeding")) type = UnitType.Class1;
-	
+
 
 		else if (designation.Contains("railway trans")) type = UnitType.Railhead;
 		else if (designation.Contains("transport")) type = UnitType.Transportation;
@@ -458,6 +471,7 @@ public class Info {
 		else if (designation.Contains("fire fighting")) type = UnitType.Firefighting;
 		else if (designation.Contains("welfare")) type = UnitType.MoraleWelfareRecreation;
 		else if (designation.Contains("administrat")) type = UnitType.Administrative;
+		else if (designation.Contains("inspection")) {unit.specialheadquarter = "INSP"; return (UnitType.Empty, "#ffffff"); }
 		#endregion
 		if (type != UnitType.Empty) return (type, colour);
 		if (designation.Contains("admiralty")) return (UnitType.Naval, "#0065bd");

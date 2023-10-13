@@ -136,6 +136,7 @@ public enum UnitType {
 	SignalRadioTeletypeCentre = 111003,
 	SignalTacticalSatellite = 111004,
 	SignalVideoImagery = 111005,
+	Sattelite = 111100,
 
 	AirTrafficServices = 120200,
 	Survey = 130900,
@@ -258,7 +259,7 @@ public enum UnitType {
 }
 
 public enum Modifier1 {
-	Empty = 0, TacticalSattelite, Area, Attack, Biological, Border, Bridging, Chemical, Protection, Combat, C2, Communications, Construction, CrossCulturalCommunication, CrowdControl, Decon, Detention, DirectCommunication, Diving, Division, Dog, Drilling, ElectroOptical, Enganced, EOD, FDC, Force, FWD, GroundStation, LandingSupport, LargeExtensionNode, Maint, Meteo, MineCM, Missile, AdvisorSupport, MobileEquipment, MobilitySupport, MovementControlCentre, Multinational, MultinationalUnit, MLRS, MED1, MED2, MED3, MED4, Naval, UAV, Nuclear, Ops, Radar, RFID, Radiological, SAR, SEC, Sensor, Weapons, SIGINT, Armoured, RocketLauncher, Smoke, Sniper, SoundRanging, SOF,
+	Empty = 0, TacticalSatellite, Area, Attack, Biological, Border, Bridging, Chemical, Protection, Combat, C2, Communications, Construction, CrossCulturalCommunication, CrowdControl, Decon, Detention, DirectCommunication, Diving, Division, Dog, Drilling, ElectroOptical, Enganced, EOD, FDC, Force, FWD, GroundStation, LandingSupport, LargeExtensionNode, Maint, Meteo, MineCM, Missile, AdvisorSupport, MobileEquipment, MobilitySupport, MovementControlCentre, Multinational, MultinationalUnit, MLRS, MED1, MED2, MED3, MED4, Naval, UAV, Nuclear, Ops, Radar, RFID, Radiological, SAR, SEC, Sensor, Weapons, SIGINT, Armoured, RocketLauncher, Smoke, Sniper, SoundRanging, SOF,
 	SWAT, Survey, TacticalExploitation, TargetAcquisition, Topographic, Utility, VideoImagery, MobilityAssault, AmphibiousShip, LHS, PLS, MEDEVAC, Ranger, Support, Aviation, RouteReconnaissanceAndClearance, TiltRotor, CommandPostNode, JointNetworkNode, RetransmissionSite, Assault, W, CriminalInvestigationDivision, Digital, Network, Aifield, Pipeline, Postal, Water, IndependentCommand, Theatre, Army, Corps, Brigade, HQ
 }
 public enum Modifier2 {

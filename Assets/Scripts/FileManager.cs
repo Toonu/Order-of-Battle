@@ -19,6 +19,7 @@ public class FileManager : MonoBehaviour {
 	//UI
 	public UIPopup popup;
 	private TMP_InputField foundUnit;
+	private TMP_Dropdown sortBy;
 
 	//Assignable by user
 	public string SearchedIdentificator { get; set; }
@@ -36,19 +37,21 @@ public class FileManager : MonoBehaviour {
 	private void Start() {
 		TMP_Dropdown dropdownTier = gameObject.transform.parent.parent.Find("Tier/Tier").GetComponent<TMP_Dropdown>();
 		TMP_Dropdown dropdownMinTier = gameObject.transform.parent.parent.Find("MinTier/MinTier").GetComponent<TMP_Dropdown>();
+		sortBy = gameObject.transform.parent.parent.Find("Sorting/SortBy").GetComponent<TMP_Dropdown>();
 		foundUnit = gameObject.transform.parent.parent.Find("Unit").GetChild(0).GetComponent<TMP_InputField>();
 		dropdownTier.ClearOptions();
 		dropdownMinTier.ClearOptions();
 
 		UnitTier[] enumValues = (UnitTier[])Enum.GetValues(typeof(UnitTier));
-		string[] enumNames = new string[enumValues.Length];
-		for (int i = 1; i < enumValues.Length; i++) {
+		string[] enumNames = new string[enumValues.Length-1];
+		for (int i = 1; i < enumValues.Length - 1; i++) {
 			enumNames[i] = enumValues[i].ToString();
 		}
 		dropdownTier.AddOptions(new List<string>(enumNames));
 		dropdownMinTier.AddOptions(new List<string>(enumNames));
 		dropdownTier.value = GetTier();
 		dropdownMinTier.value = GetMinTier();
+		sortBy.value = 0;
 
 		Screen.SetResolution(Screen.currentResolution.width/2, Screen.currentResolution.height/2, FullScreenMode.Windowed);
 		
@@ -62,10 +65,15 @@ public class FileManager : MonoBehaviour {
 		filePath = "C:/Users/Toonu/Downloads/Iconian Order of Battle - OOB.csv";
 #endif
 		LoadCSVFile();
-
+		/*
 		//Automatic printout of units of Brigade level
 		foreach (Unit unit in unitDatabase) {
-			if (unit.info.unitTier > UnitTier.III) {
+			if (unit.info.unitTier > UnitTier.III && unit.info.unitTier < UnitTier.XXX) {
+				MinTier = UnitTier.I;
+				SearchedUnit = unit;
+				ParseJSONFile();
+			} else if (unit.info.unitTier > UnitTier.X) {
+				MinTier = UnitTier.III;
 				SearchedUnit = unit;
 				ParseJSONFile();
 			}
@@ -76,7 +84,7 @@ public class FileManager : MonoBehaviour {
 #else
 		Application.Quit();
 #endif
-		
+		*/
 	}
 
 	public void FindUnit() {
@@ -106,7 +114,7 @@ public class FileManager : MonoBehaviour {
 			if (fields.Length > 3 && fields[0] == "XXENDXX") break; // End of chart useful space
 
 			if (fields.Length > 1 && !string.IsNullOrEmpty(fields[1]) && !string.IsNullOrEmpty(fields[2])) {
-				unitDatabase.Add(new(new Info(fields[1], fields[2], fields[3], fields[0], fields[4])));
+				unitDatabase.Add(new(new Info(fields[1], fields[2], fields[3], fields[0], fields[4], fields[5])));
 			}
 		}
 		Debug.Log("Import finished");
@@ -129,7 +137,7 @@ public class FileManager : MonoBehaviour {
 				units.Add(candidateUnit);
 			} else if (unit != null && candidateUnit.info.unitTier >= SearchedUnit.info.unitTier) {
 				break;
-			} else if (unit != null && (candidateUnit.info.unitTier >= MinTier || candidateUnit.info.domain != Domain.land)) {
+			} else if (unit != null && (candidateUnit.info.unitTier >= MinTier || (candidateUnit.info.domain != Domain.land && MinTier == UnitTier.I))) {
 				units.Add(candidateUnit);
 			}
 		}
@@ -149,10 +157,18 @@ public class FileManager : MonoBehaviour {
 
 		//Shuffle the lower echelons to back
 		foreach (Unit currentUnit in units) {
-			currentUnit.subordinates = currentUnit.subordinates
+			if (sortBy.value == 0) {
+				currentUnit.subordinates = currentUnit.subordinates
 				.OrderByDescending(x => x.info.unitTier)
 				.ThenBy(z => int.Parse(z.info.ID))
 				.ToList();
+			} else {
+				currentUnit.subordinates = currentUnit.subordinates
+				.OrderByDescending(x => int.Parse(x.info.ID))
+				.ThenBy(z => z.info.unitTier)
+				.ToList();
+			}
+
 
 			//Put HQ at the top no matter what
 			Unit HQ = currentUnit.subordinates.Find(x => x.info.m1 == Modifier1.HQ);
@@ -164,14 +180,21 @@ public class FileManager : MonoBehaviour {
 
 
 		//Command check
+		UnitTier backup = UnitTier.Empty;
 		if (units.First().info.unitTier > UnitTier.III && units.First().info.FullDesignation.ToLower().Contains("command")) {
+			backup = units.First().info.unitTier;
 			units.First().info.unitTier = UnitTier.Command;
 			units.First().info.sidc = units.First().info.CalculateSIDC();
 		}
 
-		ExportJSON(unit, $"{EnumUtils.ParseTier(unit.info.unitTier),5} {unit.info.FullDesignation}");
+		ExportJSON(unit, $"{EnumUtils.ParseTier(unit.info.unitTier),-5} {unit.info.FullDesignation}");
 
 		//Cleanup
+		//Command switch back
+		if (units.First().info.unitTier > UnitTier.III && units.First().info.FullDesignation.ToLower().Contains("command")) {
+			units.First().info.unitTier = backup;
+			units.First().info.sidc = units.First().info.CalculateSIDC();
+		}
 		foreach (Unit u in units) {
 			u.subordinates.Clear();
 		}
