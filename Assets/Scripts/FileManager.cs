@@ -8,7 +8,7 @@ using System.IO;
 using TMPro;
 using UnityEditor;
 using SFB;
-
+using UnityEngine.UI;
 
 public class FileManager : MonoBehaviour {
 	//File
@@ -35,22 +35,8 @@ public class FileManager : MonoBehaviour {
 	public int GetMinTier() { return (int)MinTier - 10 - (MinTier > UnitTier.X ? 2 : 0); } //UnitTier shift
 
 	private void Start() {
-		TMP_Dropdown dropdownTier = gameObject.transform.parent.parent.Find("Tier/Tier").GetComponent<TMP_Dropdown>();
-		TMP_Dropdown dropdownMinTier = gameObject.transform.parent.parent.Find("MinTier/MinTier").GetComponent<TMP_Dropdown>();
-		sortBy = gameObject.transform.parent.parent.Find("Sorting/SortBy").GetComponent<TMP_Dropdown>();
-		foundUnit = gameObject.transform.parent.parent.Find("Unit").GetChild(0).GetComponent<TMP_InputField>();
-		dropdownTier.ClearOptions();
-		dropdownMinTier.ClearOptions();
-
-		UnitTier[] enumValues = (UnitTier[])Enum.GetValues(typeof(UnitTier));
-		string[] enumNames = new string[enumValues.Length-1];
-		for (int i = 1; i < enumValues.Length - 1; i++) {
-			enumNames[i] = enumValues[i].ToString();
-		}
-		dropdownTier.AddOptions(new List<string>(enumNames));
-		dropdownMinTier.AddOptions(new List<string>(enumNames));
-		dropdownTier.value = GetTier();
-		dropdownMinTier.value = GetMinTier();
+		sortBy = gameObject.transform.parent.Find("SortBy").GetComponent<TMP_Dropdown>();
+		foundUnit = gameObject.transform.parent.Find("Unit").GetChild(0).GetComponent<TMP_InputField>();
 		sortBy.value = 0;
 
 		Screen.SetResolution(Screen.currentResolution.width/2, Screen.currentResolution.height/2, FullScreenMode.Windowed);
@@ -94,6 +80,7 @@ public class FileManager : MonoBehaviour {
 	}
 
 	public void FindUnit() {
+		if (unitDatabase.Count == 0) popup.PopUp("Load your file first!", 1.2f);
 		foreach (Unit unit in unitDatabase) {
 			if (unit.info.unitTier == SearchedTier && unit.info.FullDesignation.ToLower().Contains(SearchedIdentificator.ToLower())) {
 				SearchedUnit = unit;

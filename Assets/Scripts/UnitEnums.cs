@@ -268,39 +268,23 @@ public enum Modifier2 {
 
 public class EnumUtils {
 	public static string ParseTier(UnitTier tier) {
-		switch (tier) {
-			case UnitTier.Empty:
-				return "";
-			case UnitTier.Team:
-				return "∅";
-			case UnitTier.Squad:
-				return "●";
-			case UnitTier.Section:
-				return "●●";
-			case UnitTier.Platoon:
-				return "●●●";
-			case UnitTier.I:
-				return "I";
-			case UnitTier.II:
-				return "II";
-			case UnitTier.III:
-				return "III";
-			case UnitTier.X:
-				return "X";
-			case UnitTier.XX:
-				return "XX";
-			case UnitTier.XXX:
-				return "XXX";
-			case UnitTier.XXXX:
-				return "XXXX";
-			case UnitTier.XXXXX:
-				return "XXXXX";
-			case UnitTier.XXXXXX:
-				return "XXXXXX";
-			case UnitTier.Command:
-				return "++";
-			default:
-				return "";
-		}
+		return tier switch {
+			UnitTier.Empty => "",
+			UnitTier.Team => "∅",
+			UnitTier.Squad => "●",
+			UnitTier.Section => "●●",
+			UnitTier.Platoon => "●●●",
+			UnitTier.I => "I",
+			UnitTier.II => "II",
+			UnitTier.III => "III",
+			UnitTier.X => "X",
+			UnitTier.XX => "XX",
+			UnitTier.XXX => "XXX",
+			UnitTier.XXXX => "XXXX",
+			UnitTier.XXXXX => "XXXXX",
+			UnitTier.XXXXXX => "XXXXXX",
+			UnitTier.Command => "++",
+			_ => "",
+		};
 	}
 }
