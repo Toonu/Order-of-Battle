@@ -239,19 +239,23 @@ public class Info {
 			case "naval":
 			case "corps":
 			case "ducenarii":
+			case "task group":
+			case "task element":
+			case "task force":
+			case "fleet":
 			case "classis":
-				if (designation.Contains("patriae")) return (UnitType.CoastGuard, "#d87600");
-				else if (Regex.IsMatch(designation, ".*(trahis|investig).*")) return (UnitType.Naval, "#ffffff");
+				if (Regex.IsMatch(designation, ".*(?:patriae|coast.*guard).*")) return (UnitType.CoastGuard, "#d87600");
+				else if (Regex.IsMatch(designation, ".*(?:trahis|investig).*")) return (UnitType.Naval, "#ffffff");
 				else return (UnitType.Naval, "#0065bd");
 			case "base":
-				if (Regex.IsMatch(designation, ".*(school|academy).*")) return (UnitType.Naval, "#0065bd");
+				if (Regex.IsMatch(designation, ".*(?:school|academy).*")) return (UnitType.Naval, "#0065bd");
 				else return (UnitType.SeaportOfDebarkation, "#0065bd");
 			case "airbase":
 				return (UnitType.AirportOfDebarkation, "#80e0ff");
 			case "army":
 			case "division":
-				if (Regex.IsMatch(designation, ".*(aerospace).*")) return (UnitType.AviationFixedWing, "#80e0ff");
-				else if (Regex.IsMatch(designation, ".*(support command).*")) return (UnitType.Supply, "#d87600");
+				if (Regex.IsMatch(designation, ".*(?:aerospace).*")) return (UnitType.AviationFixedWing, "#80e0ff");
+				else if (Regex.IsMatch(designation, ".*(?:support command).*")) return (UnitType.Supply, "#d87600");
 				else return (UnitType.Infantry, "#5baa5b");
 			case "wing":
 			case "squadron":
@@ -275,10 +279,7 @@ public class Info {
 				}
 				else type = UnitType.AviationFixedWing;
 
-				if (designation.Contains("recon")) {
-					if (type == UnitType.AviationFixedWing) type = UnitType.AviationFixedWingReconnaissance;
-					else if (type == UnitType.Aviation) type = UnitType.AviationReconnaissance;
-				}
+				if (designation.Contains("recon") && type == UnitType.AviationFixedWing) type = UnitType.AviationFixedWingReconnaissance;
 				return (type, colour);
 			default:
 				break;
