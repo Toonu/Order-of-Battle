@@ -16,6 +16,7 @@ public class FileManager : MonoBehaviour {
 	private readonly List<Unit> unitDatabase = new();
 
 	//UI
+	public bool Automate = false;
 	public UIPopup popup;
 	private TMP_InputField foundUnit;
 	private TMP_Dropdown sortBy;
@@ -54,7 +55,7 @@ public class FileManager : MonoBehaviour {
 
 		Screen.SetResolution(Screen.currentResolution.width/2, Screen.currentResolution.height/2, FullScreenMode.Windowed);
 
-		//AutomateImport();
+		if(Automate) AutomateImport();
 	}
 
 
@@ -94,7 +95,7 @@ public class FileManager : MonoBehaviour {
 
 	public void FindUnit() {
 		foreach (Unit unit in unitDatabase) {
-			if (unit.info.unitTier == SearchedTier && unit.info.FullDesignation.Contains(SearchedIdentificator)) {
+			if (unit.info.unitTier == SearchedTier && unit.info.FullDesignation.ToLower().Contains(SearchedIdentificator.ToLower())) {
 				SearchedUnit = unit;
 				foundUnit.text = unit.info.FullDesignation;
 			}
@@ -105,7 +106,7 @@ public class FileManager : MonoBehaviour {
 		unitDatabase.Clear();
 		List<string> csvRows;
 		try {
-			filePath ??= StandaloneFileBrowser.OpenFilePanel("Open File", "", new ExtensionFilter[] { new ExtensionFilter("Chart", "csv") }, false)[0];
+			if(!Automate) filePath = StandaloneFileBrowser.OpenFilePanel("Open File", "", new ExtensionFilter[] { new ExtensionFilter("Chart", "csv") }, false)[0];
 			csvRows = File.ReadAllLines(filePath, Encoding.Default).ToList();
 			unitDatabase.Clear();
 		} catch (Exception e) {
@@ -123,7 +124,7 @@ public class FileManager : MonoBehaviour {
 			}
 		}
 		Debug.Log("Import finished");
-		popup.PopUp("File loaded!", 2);
+		popup.PopUp("File loaded!", 0.6f);
 	}
 
 	public void ParseJSONFile() {
@@ -135,10 +136,10 @@ public class FileManager : MonoBehaviour {
 		popup.PopUpSticky("Exporting!");
 
 		//When no searched unit assigned
-		if (string.IsNullOrEmpty(SearchedIdentificator) && SearchedUnit == null) { SearchedIdentificator = unitDatabase[0].info.designation; SearchedTier = unitDatabase[0].info.unitTier; }
+		if (string.IsNullOrEmpty(SearchedIdentificator) && SearchedUnit == null) { SearchedUnit = unitDatabase[0]; }
 
 		foreach (var candidateUnit in unitDatabase) {
-			if (unit == null && candidateUnit.info.ID == SearchedUnit.info.ID && candidateUnit.info.designation == SearchedUnit.info.designation) {
+			if (unit == null && candidateUnit.info.ID == SearchedUnit.info.ID && candidateUnit.info.FullDesignation == SearchedUnit.info.FullDesignation) {
 				unit = candidateUnit;
 				units.Add(candidateUnit);
 			} else if (unit != null && candidateUnit.info.unitTier >= SearchedUnit.info.unitTier) {
@@ -231,7 +232,7 @@ public class FileManager : MonoBehaviour {
 	private void ExportJSON(Unit unit, string fileName) {
 		//Transform old path into new file path, check for existing file and so on.
 		filePath ??= Application.dataPath; //Assign default if empty
-		string newFilePath = $"{string.Join("/", filePath.Split('/').Take(filePath.Split('/').Length - 1))}/{fileName}.json";
+		string newFilePath = Path.Combine(Path.GetDirectoryName(filePath), $"{fileName}.json");
 		if (!File.Exists(newFilePath)) File.Create(newFilePath).Close();
 		string jsonString = JsonConvert.SerializeObject(unit,
 			new JsonSerializerSettings() { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore });

@@ -19,7 +19,7 @@ public class Unit {
 	}
 
 	public override string ToString() {
-		return $"[{info.sidc}] [{info.fillColor}] {info.ID,3} {info.designation} {info.tierText} - {info.additionalInformation ?? ""}";
+		return $"[{info.unitTier,-4}] [{info.unitType}] {info.ID,3} {info.designation} {info.tierText} - {info.additionalInformation ?? ""}";
 	}
 }
 
@@ -80,10 +80,10 @@ public class Info {
 			"platoon" => UnitTier.Platoon,
 			"company" or "battery" or "flight" => UnitTier.I,
 			"battalion" or "squadron" => UnitTier.II,
-			"regiment" or "wing" or "ducenarii" => UnitTier.III,
-			"brigade" or "classis" or "airbase" => UnitTier.X,
+			"regiment" or "wing" or "ducenarii" or "task group" => UnitTier.III,
+			"brigade" or "classis" or "airbase" or "task force" => UnitTier.X,
 			"division" or "base" => UnitTier.XX,
-			"corps" or "copiis" => UnitTier.XXX,
+			"corps" or "copiis" or "fleet" => UnitTier.XXX,
 			"army" or "navy" or "air force" => UnitTier.XXXX,
 			"armygroup" => UnitTier.XXXXX,
 			"theater" => UnitTier.XXXXXX,
@@ -137,7 +137,7 @@ public class Info {
 		}
 		if (designation.Contains("aviation")) return Modifier1.Aviation;
 		if (designation.Contains("uav") && unit.unitType != UnitType.UnmannedAerialVehicle) return Modifier1.UAV;
-		if (Regex.IsMatch(designation, ".*(?:naval|anti-ship|coastal).*")) return Modifier1.Naval;
+		if (Regex.IsMatch(designation, ".*(?:naval|anti-ship|coastal).*") && !Regex.IsMatch(tierText, ".*(?:task|fleet).*")) return Modifier1.Naval;
 		if (designation.Contains("shoreline")) return Modifier1.AmphibiousShip;
 
 		if (designation.Contains("rocket")) return Modifier1.MLRS;
