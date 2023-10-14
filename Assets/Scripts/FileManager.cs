@@ -154,12 +154,18 @@ public class FileManager : MonoBehaviour {
 			if (sortBy.value == 0) {
 				currentUnit.subordinates = currentUnit.subordinates
 				.OrderByDescending(x => x.info.unitTier)
-				.ThenBy(z => int.Parse(z.info.ID))
+				.ThenBy(z => {
+					if (int.TryParse(z.info.ID, out int parsedValue)) return parsedValue;
+					else return int.MaxValue;
+				})
 				.ToList();
 			} else {
 				currentUnit.subordinates = currentUnit.subordinates
-				.OrderByDescending(x => int.Parse(x.info.ID))
-				.ThenBy(z => z.info.unitTier)
+				.OrderByDescending(z => {
+					if (int.TryParse(z.info.ID, out int parsedValue)) return parsedValue;
+					else return int.MaxValue;
+				})
+				.ThenBy(x => x.info.unitTier)
 				.ToList();
 			}
 

@@ -482,16 +482,14 @@ public class Info {
 	}
 
 	public static string AddOrdinalSuffix(string num) {
-		int number = int.Parse(num);
-		if (number >= 11 && number <= 13) {
-			return number + "th";
-		}
-
-		return (number % 10) switch {
-			1 => number + "st",
-			2 => number + "nd",
-			3 => number + "rd",
-			_ => number + "th",
-		};
+		if (int.TryParse(num, out int number)) {
+			if (number >= 11 && number <= 13) return number + "th";
+			return (number % 10) switch {
+				1 => number + "st",
+				2 => number + "nd",
+				3 => number + "rd",
+				_ => number + "th",
+			};
+		} else return num;
 	}
 }
