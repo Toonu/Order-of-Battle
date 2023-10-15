@@ -58,7 +58,6 @@ sysinfo.txt
 *.apk
 *.aab
 *.unitypackage
-*.app
 
 # Crashlytics generated file
 crashlytics-build.properties
@@ -122,8 +121,3 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
-Assets/sheetData.json
-Assets/sheetData.json.meta
-Build/World War Mode Map Manager_Data/output.log
-Assets/output.log
-Assets/output.log.meta
