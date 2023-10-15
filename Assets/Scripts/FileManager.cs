@@ -38,6 +38,7 @@ public class FileManager : MonoBehaviour {
 		sortBy = gameObject.transform.parent.Find("SortBy").GetComponent<TMP_Dropdown>();
 		foundUnit = gameObject.transform.parent.Find("Unit").GetChild(0).GetComponent<TMP_InputField>();
 		sortBy.value = 0;
+		SearchedIdentificator = "";
 
 		Screen.SetResolution(Screen.currentResolution.width/2, Screen.currentResolution.height/2, FullScreenMode.Windowed);
 
@@ -93,7 +94,7 @@ public class FileManager : MonoBehaviour {
 		unitDatabase.Clear();
 		List<string> csvRows;
 		try {
-			if(!Automate) filePath = StandaloneFileBrowser.OpenFilePanel("Open File", "", new ExtensionFilter[] { new ExtensionFilter("Chart", "csv") }, false)[0];
+			if (!Automate) filePath = StandaloneFileBrowser.OpenFilePanel("Open File", "", new ExtensionFilter[] { new ExtensionFilter("Chart", "csv") }, false)[0];
 			csvRows = File.ReadAllLines(filePath, Encoding.Default).ToList();
 			unitDatabase.Clear();
 		} catch (Exception e) {
@@ -101,9 +102,13 @@ public class FileManager : MonoBehaviour {
 			return;
 		}
 
+		//Setting separator to either , or ;
+		char separator;
+		if (csvRows[0].Contains(',')) separator = ','; else separator = ';';
+
 		csvRows.Skip(1); //Skip the header row
 		foreach (var row in csvRows.Skip(1)) {
-			string[] fields = row.Split(',');
+			string[] fields = row.Split(separator);
 			if (fields.Length > 3 && fields[0] == "XXENDXX") break; // End of chart useful space
 
 			if (fields.Length > 1 && !string.IsNullOrEmpty(fields[1]) && !string.IsNullOrEmpty(fields[2])) {
@@ -111,7 +116,7 @@ public class FileManager : MonoBehaviour {
 			}
 		}
 		Debug.Log("Import finished");
-		popup.PopUp("File loaded!", 0.6f);
+		popup.PopUp($"File with {unitDatabase.Count} units loaded!", 0.9f);
 	}
 
 	public void ParseJSONFile() {
@@ -120,7 +125,6 @@ public class FileManager : MonoBehaviour {
 		//Finding unit and creating list of its subordinate units.
 		List<Unit> units = new();
 		Unit unit = null;
-		popup.PopUpSticky("Exporting!");
 
 		//When no searched unit assigned
 		if (string.IsNullOrEmpty(SearchedIdentificator) && SearchedUnit == null) { SearchedUnit = unitDatabase[0]; }
@@ -200,8 +204,8 @@ public class FileManager : MonoBehaviour {
 		}
 		unit.subordinates.Clear();
 		units.Clear();
-		popup.CloseSticky();
 		Debug.Log("Export complete!");
+		popup.PopUp("Export complete!", 1.2f);
 	}
 
 	private void SwapColour(Unit unit) {
