@@ -84,8 +84,8 @@ public class Info {
 			"division" or "base" => UnitTier.XX,
 			"corps" or "copiis" or "fleet" => UnitTier.XXX,
 			"army" or "navy" or "air force" => UnitTier.XXXX,
-			"armygroup" => UnitTier.XXXXX,
-			"theater" => UnitTier.XXXXXX,
+			"army group" => UnitTier.XXXXX,
+			"theater" or "theatre" => UnitTier.XXXXXX,
 			_ => UnitTier.Empty,
 		};
 
