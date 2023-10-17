@@ -236,7 +236,7 @@ public class Info {
 			case "navy":
 			case "copiis":
 			case "naval":
-			case "corps":
+			case "marine corps":
 			case "ducenarii":
 			case "task group":
 			case "task element":
@@ -252,19 +252,22 @@ public class Info {
 			case "airbase":
 				return (UnitType.AirportOfDebarkation, "#80e0ff");
 			case "army":
+			case "corps":
+			case "theatre":
+			case "theater":
+				return (UnitType.Infantry, "#5baa5b");
 			case "division":
 				if (Regex.IsMatch(designation, ".*(?:aerospace).*")) return (UnitType.AviationFixedWing, "#80e0ff");
 				else if (Regex.IsMatch(designation, ".*(?:support command).*")) return (UnitType.Supply, "#d87600");
 				else break;
+			case "air force":
 			case "wing":
 			case "squadron":
 			case "flight":
-			case "air force":
 				colour = "#80e0ff";
 				if (designation.Contains("cavalr")) {
 					break;
 				}
-
 				if (designation.Contains("helicopter")) {
 					if (Regex.IsMatch(designation, ".*(?:recon|combin|attack).*")) type = UnitType.AviationReconnaissance;
 					else type = UnitType.Aviation;
@@ -363,7 +366,7 @@ public class Info {
 
 		#endregion
 		#region CS
-		if (Regex.IsMatch(designation, ".*(?:special service|special operation).*")) {
+		if (Regex.IsMatch(designation, ".*(?:special service|special operation|elite).*")) {
 			if (designation.Contains("surface")) type = UnitType.SpecialOperationsForcesGround;
 			else if (designation.Contains("naval")) type = UnitType.SpecialOperationsForcesNaval;
 			else if (designation.Contains("diving")) type = UnitType.SpecialOperationsForcesSubmarine;
