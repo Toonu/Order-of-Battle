@@ -9,6 +9,7 @@ using TMPro;
 using UnityEditor;
 using SFB;
 using UnityEngine.UI;
+using Newtonsoft.Json.Converters;
 
 public class FileManager : MonoBehaviour {
 	//File
@@ -42,7 +43,8 @@ public class FileManager : MonoBehaviour {
 
 		Screen.SetResolution(Screen.currentResolution.width/2, Screen.currentResolution.height/2, FullScreenMode.Windowed);
 
-		if(Automate) AutomateImport();
+		LoadDictionary();
+		if (Automate) AutomateImport();
 	}
 
 
@@ -51,7 +53,7 @@ public class FileManager : MonoBehaviour {
 #if UNITY_EDITOR_OSX
 		filePath = "/Users/toonu/Downloads/Iconian Order of Battle - OOB.csv";
 #elif UNITY_EDITOR
-		filePath = "C:/Users/Toonu/Downloads/Iconian Order of Battle - OOB.csv";
+		filePath = "C:/Users/Toonu/Downloads/Order of Battle - OOB.csv";
 #elif UNITY_STANDALONE_OSX
 		filePath = "/Users/toonu/Downloads/Iconian Order of Battle - OOB.csv";
 #else
@@ -90,6 +92,15 @@ public class FileManager : MonoBehaviour {
 		}
 	}
 
+	public void LoadDictionary() {
+		//Load dictionary from JSON file
+		string json = File.ReadAllText(Application.dataPath + "/Resources/UnitDictionary.json");
+		UnitDictionary data = JsonConvert.DeserializeObject<UnitDictionary>(json, new JsonSerializerSettings {
+			Converters = { new StringEnumConverter() }
+		});
+		data.SetDictionaryPatternsStatic();
+	}
+
 	public void LoadCSVFile() {
 		unitDatabase.Clear();
 		List<string> csvRows;
@@ -102,7 +113,7 @@ public class FileManager : MonoBehaviour {
 			return;
 		}
 
-		//Setting separator to either , or ;
+		//Setting separator to either , or ; and assigning correct column to each field
 		char separator;
 		if (csvRows[0].Contains(',')) separator = ','; else separator = ';';
 		string[] fields = csvRows[0].Split(separator);

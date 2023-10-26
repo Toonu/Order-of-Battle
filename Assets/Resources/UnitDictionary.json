@@ -1,0 +1,7 @@
+﻿{
+  "dictionaryPatterns": {
+    "Infantry": "(?:^training$|.*(?:weapons.*|airborne$|reserve(?!.*preserv).*|guard.*|yeomenry.*|personnel$|home.*defen[s|c]e|vehicle$|infantry.*|fusilier.*))",
+    "Artillery": "artillery|fires",
+    "Reconnaissance": ".*(?:reconnaissance$|car.*)"
+  }
+}

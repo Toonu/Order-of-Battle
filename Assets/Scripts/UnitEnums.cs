@@ -1,4 +1,7 @@
-﻿public enum UnitTier {
+﻿using Newtonsoft.Json;
+using System.Runtime.Serialization;
+
+public enum UnitTier {
 	Empty = 0,
 	Team = 11,
 	Squad = 12,
@@ -20,6 +23,7 @@ public enum UnitType {
 	#region Maneuvre
 	Combat = 120900,
 	CombinedArms = 121000,
+	[EnumMember(Value = "Infantry")]
 	Infantry = 121100,
 	InfantryAmphibious = 121101,
 	InfantryMechanized = 121102,

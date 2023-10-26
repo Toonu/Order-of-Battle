@@ -295,7 +295,7 @@ public class Info {
 		//Name matching
 		#region Maneuvre
 		if (Regex.IsMatch(designation, ".*combined.*arms.*")) type = UnitType.CombinedArms;
-		else if (Regex.IsMatch(designation, "(?:^training$|.*(?:weapons.*|airborne$|reserve(?!.*preserv).*|guard.*|yeomenry.*|personnel$|home.*defen[s|c]e|vehicle$|infantry.*|fusilier.*))")) {
+		else if (Regex.IsMatch(designation, UnitDictionary.dictionaryPatternsStatic[UnitType.Infantry])) {
 			if (Regex.IsMatch(designation, ".*(?:mechani[z|s]ed|armou?red|vehicle).*")) type = UnitType.InfantryMechanized;
 			else if (Regex.IsMatch(designation, ".*motori[z|s]ed.*")) type = UnitType.InfantryMotorized;
 			else if (Regex.IsMatch(designation, ".*(?:marine|amphi).*")) type = UnitType.InfantryAmphibious;
@@ -323,13 +323,13 @@ public class Info {
 		if (designation.Contains("cavalry")) type = UnitType.ReconnaissanceArmoured;
 		else if (Regex.IsMatch(designation, ".*(?:hh|hq|headquarter|medical support adm).*")) {
 			if (Regex.IsMatch(designation, ".*(?:armou?red|mechani[z|s]ed).*")) type = UnitType.Armoured;
-		} else if (Regex.IsMatch(designation, ".*reconnaissance$")) {
+		} else if (Regex.IsMatch(designation, UnitDictionary.dictionaryPatternsStatic[UnitType.Reconnaissance])) {
 			if (designation.Contains("nbcr")) type = UnitType.Empty;
 			else if (Regex.IsMatch(designation, ".*(?:armou?red|mechani[z|s]ed).*")) type = UnitType.ReconnaissanceArmoured;
 			else if (designation.Contains("amph")) type = UnitType.ReconnaissanceAmphibious;
 			else if (designation.Contains("motor")) type = UnitType.ReconnaissanceMotorized;
 			else type = UnitType.Reconnaissance;
-		} else if (Regex.IsMatch(designation, "^armou?red(?:$|car.*)")) type = UnitType.Armoured;
+		} else if (Regex.IsMatch(designation, "^armou?red$")) type = UnitType.Armoured;
 		else if (Regex.IsMatch(designation, ".*fire.*liaison.*")) type = UnitType.NavalFireLiason;
 		else if (Regex.IsMatch(designation, "^surveil")) type = UnitType.ReconnaissanceSurveillance;
 		else colour = "#ff3333"; //Arty
@@ -346,7 +346,7 @@ public class Info {
 		} else if (Regex.IsMatch(designation, ".*(?:light air defen[s|c]e|aaa|anti.aircraft.artillery).*")) type = UnitType.AirDefense;
 		else if (Regex.IsMatch(designation, ".*(?:air|missile).defen[s|c]e.*")) type = UnitType.AirDefenseMissile;
 		else if (Regex.IsMatch(designation, ".*(?:sph|self-propelled.*art).*")) type = UnitType.ArtillerySPH;
-		else if (Regex.IsMatch(designation, ".*(?:artillery|fires)(?!.*ammu).*")) type = UnitType.Artillery;
+		else if (Regex.IsMatch(designation, $".*{UnitDictionary.dictionaryPatternsStatic[UnitType.Artillery]}(?!.*ammu).*")) type = UnitType.Artillery;
 		else if (Regex.IsMatch(designation, ".*(?:target.*acq|counter.battery).*")) type = UnitType.ArtilleryTargetAcquisition;
 		else if (Regex.IsMatch(designation, ".*forward.*obs.*")) type = UnitType.ArtilleryForwardObserver;
 		else if (Regex.IsMatch(designation, ".*(?:anti.ship|coastal def|strategic.missile).*")) type = UnitType.Missile;
