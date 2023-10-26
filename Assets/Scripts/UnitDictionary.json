@@ -1,0 +1,8 @@
+﻿{
+    "UnitDictionary": {
+        "UnitDictionary": {
+            "Infantry": { "pattern": "infantry" },
+            "Cavalry": {"pattern":  "cavalry" }
+        }
+    }
+}

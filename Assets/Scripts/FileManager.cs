@@ -105,14 +105,29 @@ public class FileManager : MonoBehaviour {
 		//Setting separator to either , or ;
 		char separator;
 		if (csvRows[0].Contains(',')) separator = ','; else separator = ';';
+		string[] fields = csvRows[0].Split(separator);
+		int rowLocation = 0;
+		int rowID = 1;
+		int rowDesignation = 2;
+		int rowTier = 3;
+		int rowNotes = 4;
+		int rowEquipment = 5;
+		for (int i = 0; i < fields.Length; i++) {
+			if (fields[i].ToLower().Contains("base")) rowLocation = i;
+			else if (fields[i].ToLower().Contains("no.")) rowID = i;
+			else if (fields[i].ToLower().Contains("class /")) rowDesignation = i;
+			else if (fields[i].ToLower().Contains("type")) rowTier = i;
+			else if (fields[i].ToLower().Contains("notes")) rowNotes = i;
+			else if (fields[i].ToLower().Contains("equipment")) rowEquipment = i;
+		}
 
 		csvRows.Skip(1); //Skip the header row
 		foreach (var row in csvRows.Skip(1)) {
-			string[] fields = row.Split(separator);
-			if (fields.Length > 3 && fields[0] == "XXENDXX") break; // End of chart useful space
+			fields = row.Split(separator);
+			if (fields.Length > 3 && fields[rowLocation] == "XXENDXX") break; // End of chart useful space
 
-			if (fields.Length > 1 && !string.IsNullOrEmpty(fields[1]) && !string.IsNullOrEmpty(fields[2])) {
-				unitDatabase.Add(new(new Info(fields[1], fields[2], fields[3], fields[0], fields[4], fields[5])));
+			if (fields.Length > 1 && !string.IsNullOrEmpty(fields[rowID]) && !string.IsNullOrEmpty(fields[2])) {
+				unitDatabase.Add(new(new Info(fields[rowID], fields[rowDesignation], fields[rowTier], fields[rowLocation], fields[rowNotes], fields[rowEquipment])));
 			}
 		}
 		Debug.Log("Import finished");
