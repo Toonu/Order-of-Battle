@@ -90,7 +90,8 @@ public class Info {
 		};
 
 		this.ID = ID.Trim();
-		this.designation = designation.Trim();
+		this.designation = Regex.Replace(designation, "(?:^\"|\"$)", "").Trim();
+		this.designation = Regex.Replace(this.designation, "\"\"", "\"");
 		this.tierText = tierText.Trim();
 		this.notes = notes.Trim();
 		if (location != null && location != "") additionalInformation = location;
@@ -225,7 +226,7 @@ public class Info {
 
 	public static (UnitType, string) ConvertIDToType(Info unit) {
 		string designation = unit.designation.ToLower();
-		designation = Regex.Replace(designation, "\"[^\"]*\"", ""); //Replace quoted parts
+		designation = Regex.Replace(designation, "\".*\"", "").Trim(); //Replace quoted parts
 		UnitType type = UnitType.Empty;
 		string colour = "#5baa5b";
 

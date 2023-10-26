@@ -10,6 +10,7 @@ using UnityEditor;
 using SFB;
 using UnityEngine.UI;
 using Newtonsoft.Json.Converters;
+using System.Text.RegularExpressions;
 
 public class FileManager : MonoBehaviour {
 	//File
@@ -255,7 +256,8 @@ public class FileManager : MonoBehaviour {
 	private void ExportJSON(Unit unit, string fileName) {
 		//Transform old path into new file path, check for existing file and so on.
 		filePath ??= Application.dataPath; //Assign default if empty
-		string newFilePath = Path.Combine(Path.GetDirectoryName(filePath), $"{fileName}.json");
+										   //Use regular expressions to replace illegal characters with an underscore
+		string newFilePath = Path.Combine(Path.GetDirectoryName(filePath), $"{Regex.Replace(fileName, string.Format("[{0}]+", Regex.Escape(new string(Path.GetInvalidFileNameChars()))), "_")}.json");
 		if (!File.Exists(newFilePath)) File.Create(newFilePath).Close();
 		string jsonString = JsonConvert.SerializeObject(unit,
 			new JsonSerializerSettings() { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore });
