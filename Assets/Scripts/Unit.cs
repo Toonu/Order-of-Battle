@@ -294,14 +294,10 @@ public class Info {
 		//Name matching
 		#region Maneuvre
 		if (Regex.IsMatch(designation, ".*combined.*arms.*")) type = UnitType.CombinedArms;
-		else if (Regex.IsMatch(designation, "(?:^training$|.*(?:weapons.*|airborne$|reserve(?!.*preserv).*|guard.*|yeomenry.*|personnel$|home.*defen[s|c]e))")) {
-			if (Regex.IsMatch(designation, ".*(?:mechani[z|s]ed|armou?red).*")) type = UnitType.InfantryMechanized;
+		else if (Regex.IsMatch(designation, "(?:^training$|.*(?:weapons.*|airborne$|reserve(?!.*preserv).*|guard.*|yeomenry.*|personnel$|home.*defen[s|c]e|vehicle$|arm.*car.*|infantry.*|fusilier.*))")) {
+			if (Regex.IsMatch(designation, ".*(?:mechani[z|s]ed|armou?red|vehicle).*")) type = UnitType.InfantryMechanized;
 			else if (Regex.IsMatch(designation, ".*motori[z|s]ed.*")) type = UnitType.InfantryMotorized;
 			else if (Regex.IsMatch(designation, ".*(?:marine|amphi).*")) type = UnitType.InfantryAmphibious;
-			else type = UnitType.Infantry;
-		} else if (Regex.IsMatch(designation, ".*(?:infantry|vehicle$).*")) {
-			if (designation.Contains("motori[z|s]ed")) type = UnitType.InfantryMotorized;
-			else if (Regex.IsMatch(designation, ".*(?:mechani[z|s]ed|vehicle).*")) type = UnitType.InfantryMechanized;
 			else type = UnitType.Infantry;
 		} else if (Regex.IsMatch(designation, ".*(?:marine$|amphibious).*")) {
 			if (Regex.IsMatch(designation, ".*(?:mechani[z|s]ed|armou?red|medium|heavy).*")) type = UnitType.ArmouredAmphibious;
