@@ -8,7 +8,6 @@ using System.IO;
 using TMPro;
 using UnityEditor;
 using SFB;
-using UnityEngine.UI;
 using Newtonsoft.Json.Converters;
 using System.Text.RegularExpressions;
 

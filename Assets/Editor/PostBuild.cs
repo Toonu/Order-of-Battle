@@ -13,7 +13,8 @@ public class PostBuild : IPostprocessBuildWithReport {
 		string sourcePath = Path.Combine(Application.dataPath, "Resources/UnitDictionary.json");
 
 		if (File.Exists(sourcePath)) {
-			string destinationPath = Application.dataPath + "/../BuildUnitConverter/Order of Battle_Data/Resources/UnitDictionary.json";
+			string destinationPath = Path.GetDirectoryName(report.summary.outputPath) + "/OOB Converter_Data/Resources/UnitDictionary.json";
+			if (report.summary.platform == UnityEditor.BuildTarget.StandaloneOSX) return; //destinationPath = report.summary.outputPath + "/Contents/Resources/UnitDictionary.json";
 
 			try {
 				File.Copy(sourcePath, destinationPath, true);

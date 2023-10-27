@@ -83,10 +83,10 @@ public enum UnitType {
 	#endregion
 	#region CS
 	SpecialForces = 121700,
-	SpecialOperationsForces = 121800,
-	SpecialOperationsForcesGround = 121802,
-	SpecialOperationsForcesNaval = 121803,
-	SpecialOperationsForcesSubmarine = 121804,
+	SpecialOperationForces = 121800,
+	SpecialOperationForcesGround = 121802,
+	SpecialOperationForcesNaval = 121803,
+	SpecialOperationForcesSubmarine = 121804,
 	UnderwaterDemolitionTeam = 121805,
 	SpecialTroops = 111400,
 

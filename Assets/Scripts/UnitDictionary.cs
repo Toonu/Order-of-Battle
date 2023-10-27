@@ -4,13 +4,13 @@ using System.Text.RegularExpressions;
 
 [Serializable]
 public class UnitDictionary {
-	public static Dictionary<UnitType, string> dictionaryPatternsStatic { get; } = new Dictionary<UnitType, string>();
+	public static Dictionary<UnitType, string> dps { get; } = new Dictionary<UnitType, string>();
 	public Dictionary<UnitType, string> dictionaryPatterns;
 
 	public void SetDictionaryPatternsStatic() {
 		foreach (KeyValuePair<UnitType,string> item in dictionaryPatterns) {
 			string newPattern;
-			if (Regex.IsMatch(item.Value, "^(?:\\^|\\.).*")) newPattern = item.Value;
+			if (Regex.IsMatch(item.Value, "^(?:\\^|\\.|\\().*")) newPattern = item.Value;
 			else {
 				List<string> correctedValues = new();
 				string[] values = item.Value.Split("|");
@@ -20,7 +20,7 @@ public class UnitDictionary {
 				}
 				newPattern = $".*(?:{string.Join("|", correctedValues)}).*";
 			}
-			dictionaryPatternsStatic.Add(item.Key, newPattern);
+			dps.Add(item.Key, newPattern);
 		}
 	}
 }
