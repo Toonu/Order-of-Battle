@@ -14,7 +14,7 @@ public class PostBuild : IPostprocessBuildWithReport {
 
 		if (File.Exists(sourcePath)) {
 			string destinationPath = Path.GetDirectoryName(report.summary.outputPath) + "/OOB Converter_Data/Resources/UnitDictionary.json";
-			if (report.summary.platform == UnityEditor.BuildTarget.StandaloneOSX) return; //destinationPath = report.summary.outputPath + "/Contents/Resources/UnitDictionary.json";
+			if (report.summary.platform == UnityEditor.BuildTarget.StandaloneOSX) destinationPath = report.summary.outputPath + "/Contents/Resources/UnitDictionary.json";
 
 			try {
 				File.Copy(sourcePath, destinationPath, true);

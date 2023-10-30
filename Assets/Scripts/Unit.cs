@@ -256,6 +256,7 @@ public class Info {
 			case "army":
 			case "corps":
 			case "theatre":
+			case "army group":
 			case "theater":
 				return (UnitType.Infantry, "#5baa5b");
 			case "division":
