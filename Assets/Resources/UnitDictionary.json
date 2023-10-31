@@ -68,5 +68,26 @@
 		"PublicAffairs": "public rel|public aff",
 		"CivilAffairs": ".*civil affair.*[^a]",
 		"JudgeAdvocateGeneral": "legal|judg"
+	},
+	"dictionaryTierPatterns": {
+		"Team": "team",
+		"Squad": "squad",
+		"Section": "section",
+		"Platoon": "platoon",
+		"I": "company|battery|flight",
+		"II": "squadron|battalion",
+		"III": "wing|regiment|ducenarii|task.group",
+		"X": "brigade|classis|airbase|task.force",
+		"XX": "division|base",
+		"XXX": "corps|copiis|fleet",
+		"XXXX": "army|navy|air.force",
+		"XXXXX": "army.group|front",
+		"XXXXXX": "theater|theatre"
+	},
+	"dictionaryTypePatterns": {
+		"air": "air force|wing|squadron|flight",
+		"naval": "navy|copiis|naval|marine.corps|ducenarii|task.group|task.element|task.force|fleet|classis",
+		"land": "division|army|corps|theatre|theater|front|army.group",
+		"submarine": "naval|guard|imperial|royal|ducal|yeomenry"
 	}
 }

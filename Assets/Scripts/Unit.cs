@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-public enum Domain { land = 10, naval = 30, submarine = 35 }
+public enum Domain { air = 1, land = 10, naval = 30, submarine = 35 }
 
 [Serializable]
 public class Unit {
@@ -72,22 +72,20 @@ public class Info {
 	public Info() { }
 	public Info(string ID, string designation, string tierText, string location = null, string notes = null, string eq = null) {
 		domain = Domain.land; unitType = UnitType.Empty; m1 = Modifier1.Empty; m2 = Modifier2.Empty;
-		unitTier = tierText.ToLower() switch {
-			"team" => UnitTier.Team,
-			"squad" => UnitTier.Squad,
-			"section" => UnitTier.Section,
-			"platoon" => UnitTier.Platoon,
-			"company" or "battery" or "flight" => UnitTier.I,
-			"battalion" or "squadron" => UnitTier.II,
-			"regiment" or "wing" or "ducenarii" or "task group" => UnitTier.III,
-			"brigade" or "classis" or "airbase" or "task force" => UnitTier.X,
-			"division" or "base" => UnitTier.XX,
-			"corps" or "copiis" or "fleet" => UnitTier.XXX,
-			"army" or "navy" or "air force" => UnitTier.XXXX,
-			"army group" => UnitTier.XXXXX,
-			"theater" or "theatre" => UnitTier.XXXXXX,
-			_ => UnitTier.Empty,
-		};
+
+		if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.Team])) unitTier = UnitTier.Team;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.Squad])) unitTier = UnitTier.Squad;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.Section])) unitTier = UnitTier.Section;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.Platoon])) unitTier = UnitTier.Platoon;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.I])) unitTier = UnitTier.I;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.II])) unitTier = UnitTier.II;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.III])) unitTier = UnitTier.III;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.X])) unitTier = UnitTier.X;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.XX])) unitTier = UnitTier.XX;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.XXX])) unitTier = UnitTier.XXX;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.XXXX])) unitTier = UnitTier.XXXX;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.XXXXX])) unitTier = UnitTier.XXXXX;
+		else if (Regex.IsMatch(tierText.ToLower(), UnitDictionary.dtps[UnitTier.XXXXXX])) unitTier = UnitTier.XXXXXX;
 
 		this.ID = ID.Trim();
 		this.designation = Regex.Replace(designation, "(?:^\"|\"$)", "").Trim();
@@ -231,68 +229,42 @@ public class Info {
 		string colour = "#5baa5b";
 
 		//Echelon matching
-		switch (unit.tierText.ToLower()) {
-			case "brigade":
-				if (Regex.IsMatch(designation, "(?:.*air.*school.*|^aviation$)")) return (UnitType.AviationFixedWing, "#80e0ff");
-				break;
-			case "navy":
-			case "copiis":
-			case "naval":
-			case "marine corps":
-			case "ducenarii":
-			case "task group":
-			case "task element":
-			case "task force":
-			case "fleet":
-			case "classis":
-				if (Regex.IsMatch(designation, ".*(?:patriae|coast.*guard).*")) return (UnitType.CoastGuard, "#d87600");
-				else if (Regex.IsMatch(designation, ".*(?:trahis|investig).*")) return (UnitType.Naval, "#ffffff");
-				else return (UnitType.Naval, "#0065bd");
-			case "base":
-				if (Regex.IsMatch(designation, ".*(?:school|academy).*")) return (UnitType.Naval, "#0065bd");
-				else return (UnitType.SeaportOfDebarkation, "#0065bd");
-			case "airbase":
-				return (UnitType.AirportOfDebarkation, "#80e0ff");
-			case "army":
-			case "corps":
-			case "theatre":
-			case "army group":
-			case "theater":
-				return (UnitType.Infantry, "#5baa5b");
-			case "division":
-				if (Regex.IsMatch(designation, ".*(?:aerospace).*")) return (UnitType.AviationFixedWing, "#80e0ff");
-				else if (Regex.IsMatch(designation, ".*(?:support command).*")) return (UnitType.Supply, "#d87600");
-				else break;
-			case "air force":
-			case "wing":
-			case "squadron":
-			case "flight":
-				colour = "#80e0ff";
-				if (designation.Contains("cavalr")) {
-					break;
-				}
-				if (designation.Contains("helicopter")) {
-					if (Regex.IsMatch(designation, ".*(?:recon|combin|attack).*")) type = UnitType.AviationReconnaissance;
-					else type = UnitType.Aviation;
-				} 
-				else if (Regex.IsMatch(designation, ".*(?:fighter|school).*")) type = UnitType.AviationFixedWing;
-				else if (designation.Contains("combined")) type = UnitType.AviationComposite;
-				else if (designation.Contains("uav")) type = UnitType.UnmannedAerialVehicle;
-				else if (designation.Contains("cyber")) return (UnitType.ElectronicWarfare, "#ffffff");
-				else if (designation.Contains("satellite")) return (UnitType.Sattelite, "#0065bd");
-				else if (Regex.IsMatch(designation, ".*(?:space).*")) {
-					if (designation.Contains("infantry")) return (UnitType.Infantry, "#0065bd");
-					else if (designation.Contains("surve")) return (UnitType.AviationFixedWingReconnaissance, "#0065bd");
-					else if (designation.Contains("comm")) return (UnitType.SignalTacticalSatellite, "#ffffff");
-					return (UnitType.AviationFixedWing, "#0065bd");
-				}
-				else type = UnitType.AviationFixedWing;
+		if (Regex.IsMatch(unit.tierText.ToLower(), UnitDictionary.dtyps[Domain.air])) {
+			colour = "#80e0ff";
+			if (designation.Contains("cavalr")) { }
+			else if (designation.Contains("helicopter")) {
+				if (Regex.IsMatch(designation, ".*(?:recon|combin|attack).*")) type = UnitType.AviationReconnaissance;
+				else type = UnitType.Aviation;
+			}
+			else if (Regex.IsMatch(designation, ".*(?:fighter|school).*")) type = UnitType.AviationFixedWing;
+			else if (designation.Contains("combined")) type = UnitType.AviationComposite;
+			else if (designation.Contains("uav")) type = UnitType.UnmannedAerialVehicle;
+			else if (designation.Contains("cyber")) return (UnitType.ElectronicWarfare, "#ffffff");
+			else if (designation.Contains("satellite")) return (UnitType.Sattelite, "#0065bd");
+			else if (Regex.IsMatch(designation, ".*(?:space).*")) {
+				if (designation.Contains("infantry")) return (UnitType.Infantry, "#0065bd");
+				else if (designation.Contains("surve")) return (UnitType.AviationFixedWingReconnaissance, "#0065bd");
+				else if (designation.Contains("comm")) return (UnitType.SignalTacticalSatellite, "#ffffff");
+				return (UnitType.AviationFixedWing, "#0065bd");
+			}
+			else type = UnitType.AviationFixedWing;
 
-				if (designation.Contains("recon") && type == UnitType.AviationFixedWing) type = UnitType.AviationFixedWingReconnaissance;
-				return (type, colour);
-			default:
-				break;
-		}
+			if (designation.Contains("recon") && type == UnitType.AviationFixedWing) type = UnitType.AviationFixedWingReconnaissance;
+			return (type, colour);
+		} else if (Regex.IsMatch(unit.tierText.ToLower(), UnitDictionary.dtyps[Domain.land])) {
+			if (Regex.IsMatch(designation, ".*(?:brigade)*.*(?:air.*school.*|^aviation$).*(?:brigade)*.*")) return (UnitType.AviationFixedWing, "#80e0ff");
+			else if (Regex.IsMatch(designation, ".*(?:division)*.*(?:aerospace).*(?:division)*.*")) return (UnitType.AviationFixedWing, "#80e0ff");
+			else if (Regex.IsMatch(designation, ".*(?:division)*.*(?:support command).*(?:division)*.*")) return (UnitType.Supply, "#d87600");
+			else return (UnitType.Infantry, "#5baa5b");
+		} else if (Regex.IsMatch(unit.tierText.ToLower(), UnitDictionary.dtyps[Domain.naval])) {
+			if (Regex.IsMatch(designation, ".*(?:patriae|coast.*guard).*")) return (UnitType.CoastGuard, "#d87600");
+			else if (Regex.IsMatch(designation, ".*(?:trahis|investig).*")) return (UnitType.Naval, "#ffffff");
+			else return (UnitType.Naval, "#0065bd");
+		} else if (unit.tierText.ToLower() == "base") {
+			if (Regex.IsMatch(designation, ".*(?:school|academy).*")) return (UnitType.Naval, "#0065bd");
+			else return (UnitType.SeaportOfDebarkation, "#0065bd");
+		} else if (unit.tierText.ToLower() == "airbase") return (UnitType.AirportOfDebarkation, "#80e0ff");
+
 
 		//Name matching
 		#region Maneuvre
@@ -316,7 +288,7 @@ public class Info {
 		else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.Dog])) type = UnitType.Dog;
 		else colour = "#ffd00b"; //Cavalry
 								 //Colour matching
-		if (Regex.IsMatch(designation, ".*(?:naval|guard|imperial|royal|ducal|yeomenry).*")) colour = "#0065bd";
+		if (Regex.IsMatch(designation, UnitDictionary.dtyps[Domain.submarine])) colour = "#0065bd";
 		else if (Regex.IsMatch(designation, ".*(?:aerial).*")) colour = "#80e0ff";
 		if (type != UnitType.Empty) return (type, colour);
 		#endregion
