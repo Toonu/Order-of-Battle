@@ -228,7 +228,7 @@ public class Info {
 		UnitType type = UnitType.Empty;
 		string colour = "#5baa5b";
 
-		//Echelon matching
+		# region Echelon matching
 		if (Regex.IsMatch(unit.tierText.ToLower(), UnitDictionary.dtyps[Domain.air])) {
 			colour = "#80e0ff";
 			if (designation.Contains("cavalr")) { }
@@ -252,9 +252,9 @@ public class Info {
 			if (designation.Contains("recon") && type == UnitType.AviationFixedWing) type = UnitType.AviationFixedWingReconnaissance;
 			return (type, colour);
 		} else if (Regex.IsMatch(unit.tierText.ToLower(), UnitDictionary.dtyps[Domain.land])) {
-			if (Regex.IsMatch(designation, ".*(?:brigade)*.*(?:air.*school.*|^aviation$).*(?:brigade)*.*")) return (UnitType.AviationFixedWing, "#80e0ff");
-			else if (Regex.IsMatch(designation, ".*(?:division)*.*(?:aerospace).*(?:division)*.*")) return (UnitType.AviationFixedWing, "#80e0ff");
+			if (Regex.IsMatch(designation, UnitDictionary.htau)) return (UnitType.AviationFixedWing, "#80e0ff");
 			else if (Regex.IsMatch(designation, ".*(?:division)*.*(?:support command).*(?:division)*.*")) return (UnitType.Supply, "#d87600");
+			else if (unit.notes.Contains("IgnoreTier")) { }
 			else return (UnitType.Infantry, "#5baa5b");
 		} else if (Regex.IsMatch(unit.tierText.ToLower(), UnitDictionary.dtyps[Domain.naval])) {
 			if (Regex.IsMatch(designation, ".*(?:patriae|coast.*guard).*")) return (UnitType.CoastGuard, "#d87600");
@@ -264,7 +264,7 @@ public class Info {
 			if (Regex.IsMatch(designation, ".*(?:school|academy).*")) return (UnitType.Naval, "#0065bd");
 			else return (UnitType.SeaportOfDebarkation, "#0065bd");
 		} else if (unit.tierText.ToLower() == "airbase") return (UnitType.AirportOfDebarkation, "#80e0ff");
-
+		#endregion
 
 		//Name matching
 		#region Maneuvre

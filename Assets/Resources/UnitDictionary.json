@@ -91,5 +91,6 @@
 		"land": "division|army|corps|theatre|theater|front|army.group",
 		"submarine": "naval|guard|imperial|royal|ducal|yeomenry"
 	},
-	"mobilityMotorisation": "wheeled|motori[z|s]ed.*hh|medium marine|sph|self-propelled art"
+	"mobilityMotorisation": "wheeled|motori[z|s]ed.*hh|medium marine|sph|self-propelled art",
+	"higherTierAerialUnits": ".*(?:division|brigade)*.*(?:(?:aerospace|air.*school).*(?:division|brigade)*.*|^aviation$)"
 }
