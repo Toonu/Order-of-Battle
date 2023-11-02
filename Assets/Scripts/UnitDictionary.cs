@@ -7,9 +7,11 @@ public class UnitDictionary {
 	public static Dictionary<UnitType, string> dps { get; } = new Dictionary<UnitType, string>();
 	public static Dictionary<UnitTier, string> dtps { get; } = new Dictionary<UnitTier, string>();
 	public static Dictionary<Domain, string> dtyps { get; } = new Dictionary<Domain, string>();
+	public static string mms { get; private set; } = "";
 	public Dictionary<UnitType, string> dictionaryPatterns;
 	public Dictionary<UnitTier, string> dictionaryTierPatterns;
 	public Dictionary<Domain, string> dictionaryTypePatterns;
+	public string mobilityMotorisation;
 
 	public void SetDictionaryPatternsStatic() {
 		foreach (KeyValuePair<UnitType,string> item in dictionaryPatterns) {
@@ -49,5 +51,6 @@ public class UnitDictionary {
 			newPattern = $".*(?:{string.Join("|", correctedValues)}).*";
 			dtyps.Add(item.Key, newPattern);
 		}
+		mms = $".*(?:{string.Join("|", mobilityMotorisation.Split("|"))}).*";
 	}
 }

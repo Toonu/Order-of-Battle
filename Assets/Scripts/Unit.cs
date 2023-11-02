@@ -189,7 +189,7 @@ public class Info {
 		string designation = unit.designation.ToLower();
 		string tierText = unit.tierText.ToLower();
 		if (Regex.IsMatch(designation, ".*(?:airborne|parachut).*")) return Modifier2.Airborne;
-		if (Regex.IsMatch(designation, ".*(?:wheeled|motori[z|s]ed.*hh|medium marine|sph|self-propelled art).*")) return Modifier2.Wheeled;
+		if (Regex.IsMatch(designation, UnitDictionary.mms)) return Modifier2.Wheeled;
 		if (designation.Contains("tracked")) return Modifier2.Tracked;
 		if (Regex.IsMatch(designation, ".*(?:towed|horse).*")) return Modifier2.Towed;
 		if (Regex.IsMatch(designation, ".*air.*assault.*")) return Modifier2.AirAssault;
@@ -271,7 +271,7 @@ public class Info {
 		if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.CombinedArms])) type = UnitType.CombinedArms;
 		else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.Infantry])) {
 			if (Regex.IsMatch(designation, ".*(?:mechani[z|s]ed|armou?red|vehicle).*")) type = UnitType.InfantryMechanized;
-			else if (Regex.IsMatch(designation, ".*motori[z|s]ed.*")) type = UnitType.InfantryMotorized;
+			else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.InfantryMotorized])) type = UnitType.InfantryMotorized;
 			else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.InfantryAmphibious])) type = UnitType.InfantryAmphibious;
 			else type = UnitType.Infantry;
 		} else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.InfantryAmphibious])) {

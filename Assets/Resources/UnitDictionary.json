@@ -5,6 +5,7 @@
 		"Reconnaissance": ".*(?:reconnaissance$|(?:car|cavalr).*)",
 		"CombinedArms": "combined.*arms",
 		"InfantryAmphibious": "marine|amphi",
+		"InfantryMotorized": "motori[z|s]ed",
 		"Sniper": "sniper|sharpsh",
 		"AirAssault": "air assault",
 		"Security": "^(?!.*special).*security.*",
@@ -89,5 +90,6 @@
 		"naval": "navy|copiis|naval|marine.corps|ducenarii|task.group|task.element|task.force|fleet|classis",
 		"land": "division|army|corps|theatre|theater|front|army.group",
 		"submarine": "naval|guard|imperial|royal|ducal|yeomenry"
-	}
+	},
+	"mobilityMotorisation": "wheeled|motori[z|s]ed.*hh|medium marine|sph|self-propelled art"
 }

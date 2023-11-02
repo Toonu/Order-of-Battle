@@ -53,7 +53,7 @@ public class FileManager : MonoBehaviour {
 #if UNITY_EDITOR_OSX
 		filePath = "/Users/toonu/Downloads/Iconian Order of Battle - OOB.csv";
 #elif UNITY_EDITOR
-		filePath = "C:/Users/Toonu/Downloads/Order of Battle - OOB.csv";
+		filePath = "C:/Users/Toonu/Downloads/Iconian Order of Battle - OOB.csv";
 #elif UNITY_STANDALONE_OSX
 		filePath = "/Users/toonu/Downloads/Iconian Order of Battle - OOB.csv";
 #else
