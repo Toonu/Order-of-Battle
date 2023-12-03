@@ -123,14 +123,15 @@ public class Info {
 	public static Modifier1 SetModifier1(Info unit) {
 		string tierText = unit.tierText.ToLower();
 		string designation = unit.designation.ToLower();
+		designation = Regex.Replace(designation, "\".*\"", "").Trim(); //Replace quoted parts
 		if (Regex.IsMatch(designation, ".*(support command).*")) return Modifier1.Army;
 		if (Regex.IsMatch(designation, "^(?=(.*?(?:hq|headquarters|hh|admiralty|command|praesidium|institute|directorate|department|medical support adm|c\\d).*))(?!.*secu)")) return Modifier1.HQ;
 		if (designation.Contains("fighter")) return Modifier1.Force;
 		if (designation.Contains("helicopter")) {
-			if (Regex.IsMatch(designation, ".*(?<!c)sar.*")) return Modifier1.SAR;
+			if (Regex.IsMatch(designation, ".*(?<!c)(?:sar|search.*rescue).*")) return Modifier1.SAR;
 			else if (Regex.IsMatch(designation, ".*(?:attack|assault).*")) return Modifier1.Attack;
 			else if (Regex.IsMatch(designation, ".*sof.*")) return Modifier1.SOF;
-			else if (Regex.IsMatch(designation, ".*csar.*")) return Modifier1.Empty;
+			else if (Regex.IsMatch(designation, ".*(?:csar|combat.*search.*rescue).*")) return Modifier1.Empty;
 			else return Modifier1.Utility;
 		}
 		if (Regex.IsMatch(designation, ".*(?:aviation).+")) return Modifier1.Aviation;
@@ -187,6 +188,7 @@ public class Info {
 
 	public static Modifier2 SetModifier2(Info unit) {
 		string designation = unit.designation.ToLower();
+		designation = Regex.Replace(designation, "\".*\"", "").Trim(); //Replace quoted parts
 		string tierText = unit.tierText.ToLower();
 		if (Regex.IsMatch(designation, ".*(?:airborne|parachut).*")) return Modifier2.Airborne;
 		if (Regex.IsMatch(designation, UnitDictionary.mms)) return Modifier2.Wheeled;
@@ -232,11 +234,11 @@ public class Info {
 		if (Regex.IsMatch(unit.tierText.ToLower(), UnitDictionary.dtyps[Domain.air])) {
 			colour = "#80e0ff";
 			if (designation.Contains("cavalr")) { }
-			else if (designation.Contains("helicopter")) {
+			else if (Regex.IsMatch(designation, ".*(?:helicopter|rotary).*")) {
 				if (Regex.IsMatch(designation, ".*(?:recon|combin|attack).*")) type = UnitType.AviationReconnaissance;
 				else type = UnitType.Aviation;
 			}
-			else if (Regex.IsMatch(designation, ".*(?:fighter|school).*")) type = UnitType.AviationFixedWing;
+			else if (Regex.IsMatch(designation, ".*fighter.*")) type = UnitType.AviationFixedWing;
 			else if (designation.Contains("combined")) type = UnitType.AviationComposite;
 			else if (designation.Contains("uav")) type = UnitType.UnmannedAerialVehicle;
 			else if (designation.Contains("cyber")) return (UnitType.ElectronicWarfare, "#ffffff");
@@ -255,7 +257,7 @@ public class Info {
 			if (Regex.IsMatch(designation, UnitDictionary.htau)) return (UnitType.AviationFixedWing, "#80e0ff");
 			else if (Regex.IsMatch(designation, ".*(?:division)*.*(?:support command).*(?:division)*.*")) return (UnitType.Supply, "#d87600");
 			else if (unit.notes.Contains("IgnoreTier")) { }
-			else return (UnitType.Infantry, "#5baa5b");
+			else if (unit.unitTier > UnitTier.X) return (UnitType.Infantry, "#5baa5b");
 		} else if (Regex.IsMatch(unit.tierText.ToLower(), UnitDictionary.dtyps[Domain.naval])) {
 			if (Regex.IsMatch(designation, ".*(?:patriae|coast.*guard).*")) return (UnitType.CoastGuard, "#d87600");
 			else if (Regex.IsMatch(designation, ".*(?:trahis|investig).*")) return (UnitType.Naval, "#ffffff");
@@ -317,7 +319,7 @@ public class Info {
 		} else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.AirDefense])) type = UnitType.AirDefense;
 		else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.AirDefenseMissile])) type = UnitType.AirDefenseMissile;
 		else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.ArtillerySPH])) type = UnitType.ArtillerySPH;
-		else if (Regex.IsMatch(designation, $"{UnitDictionary.dps[UnitType.Artillery]}(?!.*ammu).*")) type = UnitType.Artillery;
+		else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.Artillery])) type = UnitType.Artillery;
 		else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.ArtilleryTargetAcquisition])) type = UnitType.ArtilleryTargetAcquisition;
 		else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.ArtilleryForwardObserver])) type = UnitType.ArtilleryForwardObserver;
 		else if (Regex.IsMatch(designation, UnitDictionary.dps[UnitType.Missile])) type = UnitType.Missile;

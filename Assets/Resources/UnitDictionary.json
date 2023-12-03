@@ -1,13 +1,13 @@
 ﻿{
 	"dictionaryPatterns": {
 		"Infantry": "(?:^training$|.*(?:weapons.*|airborne$|reserve(?!.*preserv).*|guard.*|yeomenry.*|personnel$|home.*defen[s|c]e|vehicle$|infantry.*|fusilier.*))",
-		"Artillery": "artillery|fires",
+		"Artillery": ".*(artillery|fires)(?!.*ammu.*)",
 		"Reconnaissance": ".*(?:reconnaissance$|(?:car|cavalr).*)",
 		"CombinedArms": "combined.*arms",
-		"InfantryAmphibious": "marine|amphi",
+		"InfantryAmphibious": ".*(?:marine|amphi)(?!.*support.*|.*security.*)",
 		"InfantryMotorized": "motori[z|s]ed",
 		"Sniper": "sniper|sharpsh",
-		"AirAssault": "air assault",
+		"AirAssault": "^air.assault$",
 		"Security": "^(?!.*special).*security.*",
 		"Dog": "dog",
 		"Space": ".*space$",
@@ -72,7 +72,7 @@
 	},
 	"dictionaryTierPatterns": {
 		"Team": "team",
-		"Squad": "squad",
+		"Squad": "^squad$",
 		"Section": "section",
 		"Platoon": "platoon",
 		"I": "company|battery|flight",
@@ -88,7 +88,7 @@
 	"dictionaryTypePatterns": {
 		"air": "air force|wing|squadron|flight",
 		"naval": "navy|copiis|naval|marine.corps|ducenarii|task.group|task.element|task.force|fleet|classis",
-		"land": "division|army|corps|theatre|theater|front|army.group",
+		"land": "brigade|division|army|corps|theatre|theater|front|army.group",
 		"submarine": "naval|guard|imperial|royal|ducal|yeomenry"
 	},
 	"mobilityMotorisation": "wheeled|motori[z|s]ed.*hh|medium marine|sph|self-propelled art",
