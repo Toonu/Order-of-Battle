@@ -81,7 +81,7 @@
 		"X": "brigade|classis|airbase|task.force",
 		"XX": "division|base",
 		"XXX": "corps|copiis|fleet",
-		"XXXX": "army|navy|air.force",
+		"XXXX": "army$|navy|air.force",
 		"XXXXX": "army.group|front",
 		"XXXXXX": "theater|theatre"
 	},
